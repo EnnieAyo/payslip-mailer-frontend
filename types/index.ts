@@ -82,3 +82,20 @@ export interface AuditLog {
   userAgent?: string;
   createdAt: Date;
 }
+
+export interface Role {
+  name: string;
+  description: string;
+  permissions: string[];
+}
+
+export interface Permission {
+  key: string;
+  description: string;
+}
+
+export interface UserManagement extends User {
+  isActive: boolean;
+  isLocked: boolean;
+  failedLoginAttempts?: number;
+}

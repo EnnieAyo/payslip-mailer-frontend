@@ -1,4 +1,4 @@
-import { AuthResponse, User, Employee, Payslip, AuditLog, PaginatedResponse, ApiResponse } from '@/types';
+import { AuthResponse, User, Employee, Payslip, AuditLog, PaginatedResponse, ApiResponse, UserManagement, Role, Permission } from '@/types';
 import { getAuthToken } from './cookies';
 
 class ApiClient {
@@ -202,6 +202,88 @@ class ApiClient {
       method: 'POST',
       body: JSON.stringify({ email }),
     });
+  }
+
+  // User Management endpoints
+  async getUsers(page: number, limit: number, search?: string): Promise<ApiResponse<UserManagement[]>> {
+    const searchParam = search ? `&search=${encodeURIComponent(search)}` : '';
+    return this.request(`/users?page=${page}&limit=${limit}${searchParam}`);
+  }
+
+  async getUser(id: number): Promise<ApiResponse<UserManagement>> {
+    return this.request(`/users/${id}`);
+  }
+
+  async createUser(data: Partial<UserManagement> & { password: string }): Promise<ApiResponse<UserManagement>> {
+    return this.request('/users', {
+      method: 'POST',
+      body: JSON.stringify({ ...data }),
+    });
+  }
+
+  async updateUser(id: number, data: Partial<UserManagement>): Promise<ApiResponse<UserManagement>> {
+    return this.request(`/users/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify({ ...data }),
+    });
+  }
+
+  async deleteUser(id: number): Promise<ApiResponse<any>> {
+    return this.request(`/users/${id}`, {
+      method: 'DELETE',
+    });
+  }
+
+  async updateUserPermissions(id: number, permissions: string[]): Promise<ApiResponse<UserManagement>> {
+    return this.request(`/users/${id}/permissions`, {
+      method: 'PATCH',
+      body: JSON.stringify({ permissions }),
+    });
+  }
+
+  async toggleUserActivation(id: number): Promise<ApiResponse<UserManagement>> {
+    return this.request(`/users/${id}/toggle-activation`, {
+      method: 'PATCH',
+    });
+  }
+
+  async unlockUser(id: number): Promise<ApiResponse<UserManagement>> {
+    return this.request(`/users/${id}/unlock`, {
+      method: 'PATCH',
+    });
+  }
+
+  // Role Management endpoints
+  async getRoles(): Promise<ApiResponse<Role[]>> {
+    return this.request('/roles');
+  }
+
+  async getRole(name: string): Promise<ApiResponse<Role>> {
+    return this.request(`/roles/${name}`);
+  }
+
+  async createRole(data: { name: string; description?: string; permissions: string[] }): Promise<ApiResponse<Role>> {
+    return this.request('/roles', {
+      method: 'POST',
+      body: JSON.stringify({ ...data }),
+    });
+  }
+
+  async updateRole(name: string, data: Partial<Role>): Promise<ApiResponse<Role>> {
+    return this.request(`/roles/${name}`, {
+      method: 'PUT',
+      body: JSON.stringify({ ...data }),
+    });
+  }
+
+  async deleteRole(name: string): Promise<ApiResponse<any>> {
+    return this.request(`/roles/${name}`, {
+      method: 'DELETE',
+    });
+  }
+
+  async getAvailablePermissions(): Promise<ApiResponse<{ data: Permission[] }>> {
+    return this.request('/roles/permissions');
   }
 }
 
