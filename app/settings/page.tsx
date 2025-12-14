@@ -208,6 +208,7 @@ export default function SettingsPage() {
                 error={
                   profileFormik.touched.firstName ? profileFormik.errors.firstName : undefined
                 }
+                readOnly
               />
               <Input
                 label="Last Name"
@@ -215,14 +216,16 @@ export default function SettingsPage() {
                 error={
                   profileFormik.touched.lastName ? profileFormik.errors.lastName : undefined
                 }
+                readOnly
               />
               <Input
                 label="Email"
                 type="email"
                 {...profileFormik.getFieldProps('email')}
                 error={profileFormik.touched.email ? profileFormik.errors.email : undefined}
+                readOnly
               />
-              <div className="flex justify-end">
+              {/* <div className="flex justify-end">
                 <Button
                   type="submit"
                   loading={updateProfileMutation.isPending}
@@ -230,7 +233,7 @@ export default function SettingsPage() {
                 >
                   Update Profile
                 </Button>
-              </div>
+              </div> */}
             </form>
           </div>
 
