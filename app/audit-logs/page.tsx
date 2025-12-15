@@ -86,15 +86,15 @@ export default function AuditLogsPage() {
         </div>
 
         <div className="bg-white dark:bg-dark-700 rounded-lg shadow mb-6">
-          <div className="p-4 border-b border-gray-200">
+          <div className="p-4 border-b border-gray-200 dark:border-dark-600">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500" />
               <input
                 type="text"
                 placeholder="Search by action, user, or details..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-dark-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-dark-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
               />
             </div>
           </div>
@@ -112,25 +112,25 @@ export default function AuditLogsPage() {
             <>
               <div className="overflow-x-auto">
                 <table className="w-full">
-                  <thead className="bg-gray-50 border-b border-gray-200">
+                  <thead className="bg-gray-50 dark:bg-dark-700 border-b border-gray-200 dark:border-dark-600">
                     <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                         Action
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                         User
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                         Details
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                         Timestamp
                       </th>
                     </tr>
                   </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
+                  <tbody className="bg-white dark:bg-dark-800 divide-y divide-gray-200 dark:divide-dark-600">
                     {filteredLogs.map((log: AuditLog) => (
-                      <tr key={log.id} className="hover:bg-gray-50">
+                      <tr key={log.id} className="hover:bg-gray-50 dark:hover:bg-dark-700">
                         <td className="px-6 py-4 whitespace-nowrap">
                           <span
                             className={`inline-flex px-2.5 py-0.5 rounded-full text-xs font-medium ${getActionColor(
@@ -141,15 +141,15 @@ export default function AuditLogsPage() {
                           </span>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-900">{log.user?.email || '-'}</div>
+                          <div className="text-sm text-gray-900 dark:text-gray-200">{log.user?.email || '-'}</div>
                         </td>
                         <td className="px-6 py-4">
-                          <div className="text-sm text-gray-900 max-w-md white-space-pre-wrap break-words">
+                          <div className="text-sm text-gray-900 dark:text-gray-200 max-w-md white-space-pre-wrap break-words">
                             {log.details || '-'}
                           </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-900">
+                          <div className="text-sm text-gray-900 dark:text-gray-200">
                             {new Date(log.createdAt).toLocaleString()}
                           </div>
                         </td>

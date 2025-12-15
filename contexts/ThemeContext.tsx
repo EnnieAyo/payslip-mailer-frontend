@@ -24,15 +24,41 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
       ? 'dark'
       : 'light';
     const initialTheme = savedTheme || systemTheme;
+    
+    console.log('Initial theme:', initialTheme, 'Saved:', savedTheme, 'System:', systemTheme);
+    
     setTheme(initialTheme);
-    document.documentElement.classList.toggle('dark', initialTheme === 'dark');
+    
+    // Apply theme class
+    if (initialTheme === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+    
+    console.log('HTML classes after init:', document.documentElement.className);
   }, []);
 
   const toggleTheme = () => {
-    const newTheme = theme === 'light' ? 'dark' : 'light';
-    setTheme(newTheme);
-    setCookieTheme(newTheme);
-    document.documentElement.classList.toggle('dark', newTheme === 'dark');
+    setTheme((prevTheme) => {
+      const newTheme = prevTheme === 'light' ? 'dark' : 'light';
+      
+      console.log('Toggling theme from', prevTheme, 'to', newTheme);
+      
+      setCookieTheme(newTheme);
+      
+      // Apply theme class
+      if (newTheme === 'dark') {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+      
+      console.log('HTML classes after toggle:', document.documentElement.className);
+      console.log('Cookie set:', getCookieTheme());
+      
+      return newTheme;
+    });
   };
 
   return (

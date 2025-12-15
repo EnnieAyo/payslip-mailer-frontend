@@ -143,7 +143,7 @@ export default function PayslipBatchesPage() {
         <div className="bg-white dark:bg-dark-700 rounded-lg shadow mb-6">
           <div className="p-4 border-b border-gray-200 space-y-4">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500" />
               <input
                 type="text"
                 placeholder="Filter by pay month (e.g., 2025-12)..."
@@ -152,7 +152,7 @@ export default function PayslipBatchesPage() {
                   setSearch(e.target.value);
                   setPage(1);
                 }}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-dark-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-dark-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
               />
             </div>
             <div className="flex flex-wrap gap-2">
@@ -163,10 +163,10 @@ export default function PayslipBatchesPage() {
                     setStatusFilter(status);
                     setPage(1);
                   }}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium border-2 transition-all duration-200 ${
+                  className={`px-4 py-2 rounded-lg text-sm font-medium border-2 transition-all duration-200 focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-dark-800 text-gray-900 dark:text-gray-100 ${
                     statusFilter === status
-                      ? 'bg-primary-500 text-white border-primary-600 shadow-md'
-                      : 'bg-white text-gray-700 border-gray-300 hover:bg-primary-50 hover:border-primary-400'
+                      ? 'bg-primary-500 text-gray-900 dark:text-gray-100 border-primary-600 shadow-md'
+                      : 'bg-white dark:bg-dark-800 text-gray-700 dark:text-gray-400 border-gray-300 hover:bg-primary-50 hover:border-primary-400'
                   }`}
                 >
                   {status.charAt(0).toUpperCase() + status.slice(1)}
@@ -191,42 +191,42 @@ export default function PayslipBatchesPage() {
             <>
               <div className="overflow-x-auto">
                 <table className="w-full">
-                  <thead className="bg-gray-50 border-b border-gray-200">
+                  <thead className="bg-gray-50 dark:bg-dark-700 border-b border-gray-200 dark:border-dark-600">
                     <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">
                         File Name
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">
                         Pay Month
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">
                         Files
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">
                         Status
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">
                         Email Status
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">
                         Created
                       </th>
-                      <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">
+                      <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">
                         Actions
                       </th>
                     </tr>
                   </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
+                  <tbody className="bg-white dark:bg-dark-800 divide-y divide-gray-200 dark:divide-dark-600">
                     {batches.map((batch: PayslipBatch) => (
-                      <tr key={batch.id} className="hover:bg-gray-50">
+                      <tr key={batch.id} className="hover:bg-gray-50 dark:hover:bg-dark-700">
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm font-medium text-dark-900">{batch.fileName}</div>
+                          <div className="text-sm font-medium text-dark-900 dark:text-gray-100">{batch.fileName}</div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-900">{batch.payMonth}</div>
+                          <div className="text-sm text-gray-900 dark:text-gray-200">{batch.payMonth}</div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-900">
+                          <div className="text-sm text-gray-900 dark:text-gray-200">
                             {batch.processedFiles || batch.totalFiles} / {batch.totalFiles}
                           </div>
                         </td>
@@ -237,7 +237,7 @@ export default function PayslipBatchesPage() {
                           {getEmailStatusBadge(batch.emailStatus)}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-500">
+                          <div className="text-sm text-gray-500 dark:text-gray-400">
                             {new Date(batch.createdAt).toLocaleDateString()}
                           </div>
                         </td>
@@ -249,7 +249,7 @@ export default function PayslipBatchesPage() {
                               onClick={() => batchDetailsMutation.mutate(batch.uuid)}
                               loading={batchDetailsMutation.isPending}
                             >
-                              <Eye className="w-4 h-4" />
+                              <Eye className="w-4 h-4 text-gray-900 dark:text-gray-400" />
                             </Button>
                             {batch.status === 'processed' && batch.emailStatus === 'pending' && (
                               <Button
@@ -262,7 +262,7 @@ export default function PayslipBatchesPage() {
                                 }}
                                 loading={sendBatchMutation.isPending}
                               >
-                                <Send className="w-4 h-4" />
+                                <Send className="w-4 h-4 text-gray-900 dark:text-gray-400" />
                               </Button>
                             )}
                           </div>

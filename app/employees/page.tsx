@@ -171,9 +171,9 @@ export default function EmployeesPage() {
         </div>
 
         <div className="bg-white dark:bg-dark-700 rounded-lg shadow mb-6">
-          <div className="p-4 border-b border-gray-200">
+          <div className="p-4 border-b border-gray-200 dark:border-dark-600">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500" />
               <input
                 type="text"
                 placeholder="Search by name, email, or IPPIS..."
@@ -182,7 +182,7 @@ export default function EmployeesPage() {
                   setSearch(e.target.value);
                   setPage(1);
                 }}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-dark-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-dark-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
               />
             </div>
           </div>
@@ -199,35 +199,35 @@ export default function EmployeesPage() {
             <>
               <div className="overflow-x-auto">
                 <table className="w-full">
-                  <thead className="bg-gray-50 border-b border-gray-200">
+                  <thead className="bg-gray-50 dark:bg-dark-700 border-b border-gray-200 dark:border-dark-600">
                     <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                         Name
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                         Email
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                         IPPIS Number
                       </th>
-                      <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                         Actions
                       </th>
                     </tr>
                   </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
+                  <tbody className="bg-white dark:bg-dark-800 divide-y divide-gray-200 dark:divide-dark-600">
                     {employees.map((employee: Employee) => (
-                      <tr key={employee.id} className="hover:bg-gray-50">
+                      <tr key={employee.id} className="hover:bg-gray-50 dark:hover:bg-dark-700">
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="text-sm font-medium text-dark-900 dark:text-gray-100">
                             {employee.firstName} {employee.lastName}
                           </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-900">{employee.email}</div>
+                          <div className="text-sm text-gray-900 dark:text-gray-200">{employee.email}</div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-900">{employee.ippisNumber}</div>
+                          <div className="text-sm text-gray-900 dark:text-gray-200">{employee.ippisNumber}</div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                           <Button
@@ -238,7 +238,7 @@ export default function EmployeesPage() {
                               setShowModal(true);
                             }}
                           >
-                            <Pencil className="w-4 h-4" />
+                            <Pencil className="w-4 h-4 text-gray-900 dark:text-gray-400" />
                           </Button>
                           <Button
                             variant="ghost"

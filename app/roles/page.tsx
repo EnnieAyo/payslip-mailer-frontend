@@ -7,6 +7,7 @@ import { useEffect, useState } from 'react';
 import { Navigation } from '@/components/Navigation';
 import { Footer } from '@/components/Footer';
 import { Button } from '@/components/Button';
+import { Input } from '@/components/Input';
 import { Modal } from '@/components/Modal';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '@/lib/api-client';
@@ -315,20 +316,13 @@ export default function RolesPage() {
             title={editingRole ? 'Edit Role' : 'Create Role'}
           >
             <form onSubmit={formik.handleSubmit} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Role Name
-                </label>
-                <input
-                  type="text"
-                  {...formik.getFieldProps('name')}
-                  disabled={!!editingRole}
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-dark-600 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-dark-700 text-gray-900 dark:text-white disabled:bg-gray-100 disabled:cursor-not-allowed"
-                />
-                {formik.touched.name && formik.errors.name && (
-                  <p className="mt-1 text-sm text-red-600">{formik.errors.name}</p>
-                )}
-              </div>
+              <Input
+                label="Role Name"
+                type="text"
+                {...formik.getFieldProps('name')}
+                disabled={!!editingRole}
+                error={formik.touched.name && formik.errors.name ? formik.errors.name : undefined}
+              />
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -337,7 +331,7 @@ export default function RolesPage() {
                 <textarea
                   {...formik.getFieldProps('description')}
                   rows={3}
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-dark-600 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-dark-700 text-gray-900 dark:text-white"
+                  className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-dark-600 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-dark-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
                 />
                 {formik.touched.description && formik.errors.description && (
                   <p className="mt-1 text-sm text-red-600">{formik.errors.description}</p>

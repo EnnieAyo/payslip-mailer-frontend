@@ -97,15 +97,15 @@ export default function DashboardPage() {
           {statCards.map((stat) => (
             <div
               key={stat.title}
-              className={`bg-white rounded-lg border-2 ${stat.borderColor} shadow p-6 hover:shadow-xl hover:scale-105 transition-all duration-200`}
+              className={`bg-white dark:bg-dark-700 rounded-lg border-2 ${stat.borderColor} dark:border-dark-600 shadow p-6 hover:shadow-xl hover:scale-105 transition-all duration-200`}
             >
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-gray-600 dark:text-gray-400 mb-1 font-medium">{stat.title}</p>
                   <p className="text-3xl font-bold text-dark-900 dark:text-gray-100">{stat.value}</p>
                 </div>
-                <div className={`${stat.bgColor} p-3 rounded-lg border ${stat.borderColor}`}>
-                  <stat.icon className={`w-6 h-6 ${stat.color}`} />
+                <div className={`${stat.bgColor} dark:bg-dark-600 p-3 rounded-lg border ${stat.borderColor} dark:border-dark-500`}>
+                  <stat.icon className={`w-6 h-6 ${stat.color} dark:text-primary-400`} />
                 </div>
               </div>
             </div>
@@ -113,7 +113,7 @@ export default function DashboardPage() {
         </div>
 
         <div className="bg-white dark:bg-dark-700 rounded-lg shadow">
-          <div className="px-6 py-4 border-b border-gray-200">
+          <div className="px-6 py-4 border-b border-gray-200 dark:border-dark-600">
             <h2 className="text-xl font-semibold text-dark-900 dark:text-gray-100">Recent Activity</h2>
           </div>
           <div className="p-6">
@@ -122,7 +122,7 @@ export default function DashboardPage() {
                 {auditLogsData.data.slice(0, 5).map((log: any) => (
                   <div
                     key={log.id}
-                    className="flex items-start space-x-3 pb-4 border-b border-gray-100 last:border-0"
+                    className="flex items-start space-x-3 pb-4 border-b border-gray-100 dark:border-dark-600 last:border-0"
                   >
                     <div className="flex-shrink-0">
                       <div className="w-2 h-2 bg-primary-500 rounded-full mt-2"></div>
@@ -131,7 +131,7 @@ export default function DashboardPage() {
                       <p className="text-sm text-dark-900 dark:text-gray-100">
                         {log.action} by {log.user?.email}
                       </p>
-                      <p className="text-xs text-gray-500 mt-1">
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                         {new Date(log.createdAt).toLocaleString()}
                       </p>
                     </div>
@@ -139,7 +139,7 @@ export default function DashboardPage() {
                 ))}
               </div>
             ) : (
-              <p className="text-gray-500 text-center py-8">No recent activity</p>
+              <p className="text-gray-500 dark:text-gray-400 text-center py-8">No recent activity</p>
             )}
           </div>
         </div>

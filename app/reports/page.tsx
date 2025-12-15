@@ -211,14 +211,14 @@ export default function ReportsPage() {
 
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {reports.map((report) => (
-            <div key={report.id} className="bg-white dark:bg-dark-700 rounded-lg border-2 border-primary-200 shadow p-6 hover:shadow-xl hover:border-primary-400 hover:scale-105 transition-all duration-200">
+            <div key={report.id} className="bg-white dark:bg-dark-700 rounded-lg border-2 border-primary-200 dark:border-dark-600 shadow p-6 hover:shadow-xl hover:border-primary-400 dark:hover:border-primary-500 hover:scale-105 transition-all duration-200">
               <div className="flex items-center space-x-3 mb-4">
-                <div className="bg-primary-100 border-2 border-primary-300 p-3 rounded-lg">
-                  <report.icon className="w-6 h-6 text-primary-600" />
+                <div className="bg-primary-100 dark:bg-dark-600 border-2 border-primary-300 dark:border-dark-500 p-3 rounded-lg">
+                  <report.icon className="w-6 h-6 text-primary-600 dark:text-primary-400" />
                 </div>
                 <div>
                   <h3 className="text-lg font-semibold text-dark-900 dark:text-gray-100">{report.title}</h3>
-                  <p className="text-sm text-gray-500">{report.count} records</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">{report.count} records</p>
                 </div>
               </div>
               <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">{report.description}</p>
@@ -248,7 +248,7 @@ export default function ReportsPage() {
           ))}
         </div>
 
-        <div className="mt-8 bg-white rounded-lg shadow p-6">
+        <div className="mt-8 bg-white dark:bg-dark-700 rounded-lg shadow p-6">
           <h2 className="text-xl font-semibold text-dark-900 dark:text-gray-100 mb-4">Report Information</h2>
           <div className="space-y-3 text-sm text-gray-600 dark:text-gray-400">
             <p>

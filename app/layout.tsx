@@ -39,21 +39,30 @@ export default function RootLayout({
                   {children}
                 <Toaster
                   position="top-right"
-                toastOptions={{
-                  duration: 5000,
-                  style: {
-                    background: '#000',
-                    color: '#fff',
-                    border: '1px solid #FCD34D',
-                  },
-                  success: {
-                    iconTheme: {
-                      primary: '#FCD34D',
-                      secondary: '#000',
+                  toastOptions={{
+                    duration: 5000,
+                    className: '',
+                    style: {},
+                    success: {
+                      style: {
+                        background: 'var(--background)',
+                        color: 'var(--foreground)',
+                        border: '1px solid #FCD34D',
+                      },
+                      iconTheme: {
+                        primary: '#FCD34D',
+                        secondary: 'var(--background)',
+                      },
                     },
-                  },
-                }}
-              />
+                    error: {
+                      style: {
+                        background: 'var(--background)',
+                        color: 'var(--foreground)',
+                        border: '1px solid #EF4444',
+                      },
+                    },
+                  }}
+                />
               </AuthProvider>
             </QueryProvider>
           </SidebarProvider>
