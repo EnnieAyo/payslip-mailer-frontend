@@ -1,3 +1,4 @@
+import { User } from '@/types';
 import Cookies from 'js-cookie';
 
 // Cookie configuration
@@ -50,6 +51,10 @@ export function setUserData(user: any) {
     firstName: user.firstName,
     lastName: user.lastName,
     role: user.role,
+    permissions: user.permissions,
+    emailVerified: user.emailVerified,
+    twoFactorEnabled: user.twoFactorEnabled,
+    lastLoginAt: user.lastLoginAt,
   };
   setCookie(COOKIE_KEYS.USER, JSON.stringify(userData), SHORT_COOKIE_OPTIONS);
 }
@@ -57,7 +62,7 @@ export function setUserData(user: any) {
 export function getUserData(): any | null {
   const userData = getCookie(COOKIE_KEYS.USER);
   if (!userData) return null;
-  
+
   try {
     return JSON.parse(userData);
   } catch (error) {
