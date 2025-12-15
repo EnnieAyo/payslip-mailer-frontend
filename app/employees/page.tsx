@@ -10,7 +10,7 @@ import { Modal } from '@/components/Modal';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '@/lib/api-client';
 import { Employee } from '@/types';
-import { Search, Plus, Pencil, Trash2, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Search, Plus, Pencil, Trash2, ChevronLeft, ChevronRight, Upload } from 'lucide-react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import toast from 'react-hot-toast';
@@ -142,17 +142,27 @@ export default function EmployeesPage() {
             <h1 className="text-3xl font-bold text-dark-900 dark:text-gray-100">Employees</h1>
             <p className="text-gray-600 dark:text-gray-400 mt-2">Manage employee records</p>
           </div>
-          <Button
-            onClick={() => {
-              setEditingEmployee(null);
-              formik.resetForm();
-              setShowModal(true);
-            }}
-            className="mt-4 sm:mt-0"
-          >
-            <Plus className="w-4 h-4 mr-2" />
-            Add Employee
-          </Button>
+            <div className="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between">
+              <Button
+                onClick={() => {
+                  setEditingEmployee(null);
+                  formik.resetForm();
+                  setShowModal(true);
+                }}
+                className="mt-4 mr-2 sm:mt-0"
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                Add Employee
+              </Button>
+              <Button
+              variant='secondary'
+              onClick={() => router.push('/employees/bulk-upload')}
+              className="mt-4 mr-2 sm:mt-0"
+            >
+              <Upload className="w-4 h-4 mr-2" />
+              Mass Upload
+            </Button>
+          </div>
         </div>
 
         <div className="bg-white dark:bg-dark-700 rounded-lg shadow mb-6">

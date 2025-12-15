@@ -2,62 +2,67 @@
 
 import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState } from 'react';
 import { Navigation } from '@/components/Navigation';
 import { Button } from '@/components/Button';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '@/lib/api-client';
-import { Payslip } from '@/types';
-import { Upload, FileText, Search, RefreshCw, ChevronLeft, ChevronRight, CheckCircle, Clock } from 'lucide-react';
+import { PayslipBatch, BatchDetails } from '@/types/payslip-batch.types';
+import { Upload, Search, ChevronLeft, ChevronRight, Eye, Send, CheckCircle, Clock, AlertCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { PayslipUploadModal } from '@/components/payslips/PayslipUploadModal';
+import { BatchDetailsModal } from '@/components/payslips/BatchDetailsModal';
 
-export default function PayslipsPage() {
+export default function PayslipBatchesPage() {
   const { user, isLoading } = useAuth();
   const router = useRouter();
   const queryClient = useQueryClient();
 
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
-  const [statusFilter, setStatusFilter] = useState<'all' | 'sent' | 'unsent'>('all');
-  const [dragging, setDragging] = useState(false);
-  const [uploading, setUploading] = useState(false);
+  const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [uploadModalOpen, setUploadModalOpen] = useState(false);
+  const [detailsModalOpen, setDetailsModalOpen] = useState(false);
+  const [selectedBatch, setSelectedBatch] = useState<BatchDetails | null>(null);
 
   const limit = 10;
 
-  const { data, isLoading: isLoadingPayslips } = useQuery({
-    queryKey: ['payslips', { page, search, statusFilter }],
+  const { data, isLoading: isLoadingBatches } = useQuery({
+    queryKey: ['payslip-batches', { page, search, statusFilter }],
     queryFn: async () => {
-      if (statusFilter === 'unsent') {
-        return apiClient.getUnsentPayslips();
-      }
-      // For 'all' and 'sent' we need to implement filtering on backend or client-side
-      const result = await apiClient.getUnsentPayslips();
-      return result;
+      return apiClient.getPayslipBatches({
+        page,
+        limit,
+        payMonth: search || undefined,
+        status: statusFilter !== 'all' ? statusFilter : undefined,
+      });
     },
     enabled: !!user,
   });
 
   const uploadMutation = useMutation({
-    mutationFn: (file: File) => apiClient.uploadPayslips(file),
+    mutationFn: ({ file, payMonth }: { file: File; payMonth: string }) =>
+      apiClient.uploadPayslipBatch(file, payMonth),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['payslips'] });
-      toast.success('Payslips uploaded successfully');
-      setUploading(false);
-    },
-    onError: () => {
-      toast.error('Failed to upload payslips');
-      setUploading(false);
+      queryClient.invalidateQueries({ queryKey: ['payslip-batches'] });
     },
   });
 
-  const resendMutation = useMutation({
-    mutationFn: (id: number) => apiClient.resendPayslip(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['payslips'] });
-      toast.success('Payslip resent successfully');
+  const batchDetailsMutation = useMutation({
+    mutationFn: (batchId: string) => apiClient.getBatchDetails(batchId),
+    onSuccess: (response) => {
+      setSelectedBatch(response.data as BatchDetails);
+      setDetailsModalOpen(true);
     },
     onError: () => {
-      toast.error('Failed to resend payslip');
+      toast.error('Failed to load batch details');
+    },
+  });
+
+  const sendBatchMutation = useMutation({
+    mutationFn: (batchId: string) => apiClient.sendBatch(batchId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['payslip-batches'] });
     },
   });
 
@@ -67,42 +72,6 @@ export default function PayslipsPage() {
     }
   }, [user, isLoading, router]);
 
-  const handleFileSelect = useCallback(
-    async (file: File) => {
-      if (!file.type.includes('pdf')) {
-        toast.error('Please upload a PDF file');
-        return;
-      }
-
-      setUploading(true);
-      uploadMutation.mutate(file);
-    },
-    [uploadMutation]
-  );
-
-  const handleDrop = useCallback(
-    (e: React.DragEvent) => {
-      e.preventDefault();
-      setDragging(false);
-
-      const file = e.dataTransfer.files[0];
-      if (file) {
-        handleFileSelect(file);
-      }
-    },
-    [handleFileSelect]
-  );
-
-  const handleDragOver = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-    setDragging(true);
-  }, []);
-
-  const handleDragLeave = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-    setDragging(false);
-  }, []);
-
   if (isLoading || !user) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
@@ -111,82 +80,59 @@ export default function PayslipsPage() {
     );
   }
 
-  const payslips = data?.data || [];
-  const filteredPayslips = payslips.filter((p: Payslip) => {
-    const matchesSearch =
-      !search ||
-      p.employee?.firstName.toLowerCase().includes(search.toLowerCase()) ||
-      p.employee?.lastName.toLowerCase().includes(search.toLowerCase()) ||
-      p.employee?.email.toLowerCase().includes(search.toLowerCase()) ||
-      p.employee?.ippisNumber.toLowerCase().includes(search.toLowerCase());
+  const batches = data?.data || [];
+  const total = data?.meta?.total || 0;
+  const totalPages = data?.meta?.totalPages || 0;
 
-    const matchesStatus =
-      statusFilter === 'all' ||
-      (statusFilter === 'sent' && p.sentAt) ||
-      (statusFilter === 'unsent' && !p.sentAt);
+  const getStatusBadge = (status: string) => {
+    const config = {
+      pending: { bg: 'bg-gray-100', text: 'text-gray-800', icon: Clock },
+      processing: { bg: 'bg-blue-100', text: 'text-blue-800', icon: Clock },
+      processed: { bg: 'bg-green-100', text: 'text-green-800', icon: CheckCircle },
+      failed: { bg: 'bg-red-100', text: 'text-red-800', icon: AlertCircle },
+      completed: { bg: 'bg-green-100', text: 'text-green-800', icon: CheckCircle },
+    };
+    const s = config[status as keyof typeof config] || config.pending;
+    const Icon = s.icon;
+    return (
+      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${s.bg} ${s.text}`}>
+        <Icon className="w-3 h-3 mr-1" />
+        {status.charAt(0).toUpperCase() + status.slice(1)}
+      </span>
+    );
+  };
 
-    return matchesSearch && matchesStatus;
-  });
-
-  const total = filteredPayslips.length;
-  const totalPages = Math.ceil(total / limit);
-  const paginatedPayslips = filteredPayslips.slice((page - 1) * limit, page * limit);
+  const getEmailStatusBadge = (emailStatus: string) => {
+    const config = {
+      pending: { bg: 'bg-orange-100', text: 'text-orange-800' },
+      sending: { bg: 'bg-blue-100', text: 'text-blue-800' },
+      completed: { bg: 'bg-green-100', text: 'text-green-800' },
+      partial: { bg: 'bg-yellow-100', text: 'text-yellow-800' },
+      failed: { bg: 'bg-red-100', text: 'text-red-800' },
+    };
+    const s = config[emailStatus as keyof typeof config] || config.pending;
+    return (
+      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${s.bg} ${s.text}`}>
+        {emailStatus.charAt(0).toUpperCase() + emailStatus.slice(1)}
+      </span>
+    );
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-dark-800">
       <Navigation />
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-dark-900 dark:text-gray-100">Payslips</h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-2">Upload and manage employee payslips</p>
-        </div>
-
-        <div
-          className={`bg-white rounded-lg shadow p-8 mb-6 border-2 border-dashed transition-colors ${
-            dragging ? 'border-primary-500 bg-primary-50' : 'border-gray-300'
-          }`}
-          onDrop={handleDrop}
-          onDragOver={handleDragOver}
-          onDragLeave={handleDragLeave}
-        >
-          <div className="text-center">
-            <Upload className="mx-auto h-12 w-12 text-gray-400" />
-            <h3 className="mt-2 text-sm font-medium text-dark-900 dark:text-gray-100">Upload Payslips</h3>
-            <p className="mt-1 text-sm text-gray-500">
-              Drag and drop a PDF file here, or click to select
+        <div className="mb-8 flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-dark-900 dark:text-gray-100">Payslip Batches</h1>
+            <p className="text-gray-600 dark:text-gray-400 mt-2">
+              Upload, review, and send payslip batches
             </p>
-            <div className="mt-6">
-              <input
-                type="file"
-                id="file-upload"
-                className="hidden"
-                accept=".pdf"
-                onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  if (file) handleFileSelect(file);
-                }}
-                disabled={uploading}
-              />
-              <label
-                htmlFor="file-upload"
-                className={`inline-flex items-center justify-center px-4 py-2 border-2 border-primary-600 text-sm font-medium rounded-lg shadow-sm text-dark-900 dark:text-gray-100 bg-primary-500 hover:bg-primary-600 hover:border-primary-700 hover:shadow-md active:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-all duration-200 ${
-                  uploading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'
-                }`}
-              >
-                {uploading ? (
-                  <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2"></div>
-                    Uploading...
-                  </>
-                ) : (
-                  <>
-                    <Upload className="w-4 h-4 mr-2" />
-                    Select PDF
-                  </>
-                )}
-              </label>
-            </div>
           </div>
+          <Button onClick={() => setUploadModalOpen(true)}>
+            <Upload className="w-4 h-4 mr-2" />
+            Upload Batch
+          </Button>
         </div>
 
         <div className="bg-white dark:bg-dark-700 rounded-lg shadow mb-6">
@@ -195,7 +141,7 @@ export default function PayslipsPage() {
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
               <input
                 type="text"
-                placeholder="Search by name, email, or IPPIS..."
+                placeholder="Filter by pay month (e.g., 2025-12)..."
                 value={search}
                 onChange={(e) => {
                   setSearch(e.target.value);
@@ -205,56 +151,36 @@ export default function PayslipsPage() {
               />
             </div>
             <div className="flex flex-wrap gap-2">
-              <button
-                onClick={() => {
-                  setStatusFilter('all');
-                  setPage(1);
-                }}
-                className={`px-4 py-2 rounded-lg text-sm font-medium border-2 transition-all duration-200 ${
-                  statusFilter === 'all'
-                    ? 'bg-primary-500 text-dark-900 dark:text-gray-100 border-primary-600 shadow-md'
-                    : 'bg-white text-gray-700 border-gray-300 hover:bg-primary-50 hover:border-primary-400 hover:shadow-sm'
-                }`}
-              >
-                All
-              </button>
-              <button
-                onClick={() => {
-                  setStatusFilter('sent');
-                  setPage(1);
-                }}
-                className={`px-4 py-2 rounded-lg text-sm font-medium border-2 transition-all duration-200 ${
-                  statusFilter === 'sent'
-                    ? 'bg-primary-500 text-dark-900 dark:text-gray-100 border-primary-600 shadow-md'
-                    : 'bg-white text-gray-700 border-gray-300 hover:bg-primary-50 hover:border-primary-400 hover:shadow-sm'
-                }`}
-              >
-                Sent
-              </button>
-              <button
-                onClick={() => {
-                  setStatusFilter('unsent');
-                  setPage(1);
-                }}
-                className={`px-4 py-2 rounded-lg text-sm font-medium border-2 transition-all duration-200 ${
-                  statusFilter === 'unsent'
-                    ? 'bg-primary-500 text-dark-900 dark:text-gray-100 border-primary-600 shadow-md'
-                    : 'bg-white text-gray-700 border-gray-300 hover:bg-primary-50 hover:border-primary-400 hover:shadow-sm'
-                }`}
-              >
-                Unsent
-              </button>
+              {['all', 'processing', 'processed', 'completed', 'failed'].map((status) => (
+                <button
+                  key={status}
+                  onClick={() => {
+                    setStatusFilter(status);
+                    setPage(1);
+                  }}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium border-2 transition-all duration-200 ${
+                    statusFilter === status
+                      ? 'bg-primary-500 text-white border-primary-600 shadow-md'
+                      : 'bg-white text-gray-700 border-gray-300 hover:bg-primary-50 hover:border-primary-400'
+                  }`}
+                >
+                  {status.charAt(0).toUpperCase() + status.slice(1)}
+                </button>
+              ))}
             </div>
           </div>
 
-          {isLoadingPayslips ? (
+          {isLoadingBatches ? (
             <div className="flex items-center justify-center py-12">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500"></div>
             </div>
-          ) : paginatedPayslips.length === 0 ? (
+          ) : batches.length === 0 ? (
             <div className="text-center py-12">
-              <FileText className="mx-auto h-12 w-12 text-gray-400" />
-              <p className="text-gray-500 mt-2">No payslips found</p>
+              <Upload className="mx-auto h-12 w-12 text-gray-400" />
+              <p className="text-gray-500 mt-2">No batches found</p>
+              <Button onClick={() => setUploadModalOpen(true)} className="mt-4">
+                Upload First Batch
+              </Button>
             </div>
           ) : (
             <>
@@ -262,72 +188,79 @@ export default function PayslipsPage() {
                 <table className="w-full">
                   <thead className="bg-gray-50 border-b border-gray-200">
                     <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Employee
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                        File Name
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        IPPIS
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                        Pay Month
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Month
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                        Files
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
                         Status
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Sent At
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                        Email Status
                       </th>
-                      <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                        Created
+                      </th>
+                      <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">
                         Actions
                       </th>
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
-                    {paginatedPayslips.map((payslip: Payslip) => (
-                      <tr key={payslip.id} className="hover:bg-gray-50">
+                    {batches.map((batch: PayslipBatch) => (
+                      <tr key={batch.id} className="hover:bg-gray-50">
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm font-medium text-dark-900 dark:text-gray-100">
-                            {payslip.employee?.firstName} {payslip.employee?.lastName}
-                          </div>
-                          <div className="text-sm text-gray-500">{payslip.employee?.email}</div>
+                          <div className="text-sm font-medium text-dark-900">{batch.fileName}</div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-900">{payslip.employee?.ippisNumber}</div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-900">{payslip.month}</div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          {payslip.sentAt ? (
-                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                              <CheckCircle className="w-3 h-3 mr-1" />
-                              Sent
-                            </span>
-                          ) : (
-                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
-                              <Clock className="w-3 h-3 mr-1" />
-                              Unsent
-                            </span>
-                          )}
+                          <div className="text-sm text-gray-900">{batch.payMonth}</div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="text-sm text-gray-900">
-                            {payslip.sentAt
-                              ? new Date(payslip.sentAt).toLocaleString()
-                              : '-'}
+                            {batch.processedFiles || batch.totalFiles} / {batch.totalFiles}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          {getStatusBadge(batch.status)}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          {getEmailStatusBadge(batch.emailStatus)}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm text-gray-500">
+                            {new Date(batch.createdAt).toLocaleDateString()}
                           </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                          {!payslip.sentAt && (
+                          <div className="flex items-center justify-end gap-2">
                             <Button
                               variant="ghost"
                               size="sm"
-                              onClick={() => resendMutation.mutate(payslip.id)}
-                              loading={resendMutation.isPending}
+                              onClick={() => batchDetailsMutation.mutate(batch.uuid)}
+                              loading={batchDetailsMutation.isPending}
                             >
-                              <RefreshCw className="w-4 h-4" />
+                              <Eye className="w-4 h-4" />
                             </Button>
-                          )}
+                            {batch.status === 'processed' && batch.emailStatus === 'pending' && (
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => {
+                                  if (confirm(`Send emails for ${batch.payMonth} batch?`)) {
+                                    sendBatchMutation.mutate(batch.uuid);
+                                  }
+                                }}
+                                loading={sendBatchMutation.isPending}
+                              >
+                                <Send className="w-4 h-4" />
+                              </Button>
+                            )}
+                          </div>
                         </td>
                       </tr>
                     ))}
@@ -337,9 +270,8 @@ export default function PayslipsPage() {
 
               {totalPages > 1 && (
                 <div className="px-6 py-4 border-t border-gray-200 flex items-center justify-between">
-                  <div className="text-sm text-gray-600 dark:text-gray-400">
-                    Showing {(page - 1) * limit + 1} to {Math.min(page * limit, total)} of{' '}
-                    {total} payslips
+                  <div className="text-sm text-gray-600">
+                    Showing {(page - 1) * limit + 1} to {Math.min(page * limit, total)} of {total} batches
                   </div>
                   <div className="flex space-x-2">
                     <Button
@@ -365,6 +297,26 @@ export default function PayslipsPage() {
           )}
         </div>
       </main>
+
+      <PayslipUploadModal
+        isOpen={uploadModalOpen}
+        onClose={() => setUploadModalOpen(false)}
+        onSuccess={() => {
+          queryClient.invalidateQueries({ queryKey: ['payslip-batches'] });
+        }}
+        onUpload={(file, payMonth) => uploadMutation.mutateAsync({ file, payMonth })}
+      />
+
+      <BatchDetailsModal
+        isOpen={detailsModalOpen}
+        onClose={() => {
+          setDetailsModalOpen(false);
+          setSelectedBatch(null);
+        }}
+        batch={selectedBatch}
+        onSend={(batchId) => sendBatchMutation.mutateAsync(batchId)}
+        loading={sendBatchMutation.isPending}
+      />
     </div>
   );
 }

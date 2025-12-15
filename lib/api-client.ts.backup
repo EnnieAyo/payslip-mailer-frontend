@@ -1,4 +1,4 @@
-import { AuthResponse, User, Employee, Payslip, AuditLog, PaginatedResponse, ApiResponse, UserManagement, Role, Permission, BulkUploadResultDto, PayslipBatch, BatchDetails, UploadResultDto, BatchSendResultDto, GetBatchesParams } from '@/types';
+import { AuthResponse, User, Employee, Payslip, AuditLog, PaginatedResponse, ApiResponse, UserManagement, Role, Permission, BulkUploadResultDto } from '@/types';
 import { getAuthToken } from './cookies';
 
 class ApiClient {
@@ -130,42 +130,17 @@ class ApiClient {
   }
 
   // Payslip endpoints
-  // Payslip Batch Management Endpoints
-  async uploadPayslipBatch(file: File, payMonth: string): Promise<ApiResponse<UploadResultDto>> {
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('payMonth', payMonth);
-
-    const token = getAuthToken();
-    const response = await fetch(`${this.baseURL}/payslips/upload`, {
-      method: 'POST',
-      headers: {
-        ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
-      },
-      credentials: 'include',
-      body: formData,
-    });
-
-    if (!response.ok) {
-      const error = await response.json().catch(() => ({ message: 'Upload failed' }));
-      throw new Error(error.message || 'Upload failed');
-    }
-
-    return response.json();
-  }
-
-  // Legacy single file upload method (for backward compatibility)
   async uploadPayslips(file: File): Promise<ApiResponse<any>> {
     const formData = new FormData();
     formData.append('file', file);
 
-    const token = getAuthToken();
+    const token = getAuthToken(); // Use cookie instead of localStorage
     const response = await fetch(`${this.baseURL}/payslips/upload`, {
       method: 'POST',
       headers: {
         ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
       },
-      credentials: 'include',
+      credentials: 'include', // Important for cookies
       body: formData,
     });
 
@@ -177,32 +152,6 @@ class ApiClient {
     return response.json();
   }
 
-  async getPayslipBatches(params?: GetBatchesParams): Promise<ApiResponse<PayslipBatch[]>> {
-    const queryParams = new URLSearchParams();
-    if (params?.page) queryParams.append('page', params.page.toString());
-    if (params?.limit) queryParams.append('limit', params.limit.toString());
-    if (params?.payMonth) queryParams.append('payMonth', params.payMonth);
-    if (params?.status) queryParams.append('status', params.status);
-
-    const queryString = queryParams.toString();
-    return this.request(`/payslips/batches${queryString ? `?${queryString}` : ''}`);
-  }
-
-  async getPendingBatches(): Promise<ApiResponse<PayslipBatch[]>> {
-    return this.request('/payslips/batches/pending');
-  }
-
-  async getBatchDetails(batchId: string): Promise<ApiResponse<BatchDetails>> {
-    return this.request(`/payslips/batches/${batchId}`);
-  }
-
-  async sendBatch(batchId: string): Promise<ApiResponse<BatchSendResultDto>> {
-    return this.request(`/payslips/batches/${batchId}/send`, {
-      method: 'POST',
-    });
-  }
-
-  // Legacy/Individual Payslip Methods
   async getPayslipsByEmployee(employeeId: number): Promise<ApiResponse<Payslip[]>> {
     return this.request(`/payslips/employee/${employeeId}`);
   }
@@ -220,6 +169,7 @@ class ApiClient {
   async getUploadStatus(uploadId: string): Promise<ApiResponse<any>> {
     return this.request(`/payslips/upload/${uploadId}/status`);
   }
+
   // Audit log endpoints
   async getAuditLogs(page: number, limit: number): Promise<ApiResponse<AuditLog[]>> {
     return this.request(`/audit/logs?page=${page}&limit=${limit}`);

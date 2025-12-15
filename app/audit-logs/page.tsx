@@ -139,7 +139,7 @@ export default function AuditLogsPage() {
                           <div className="text-sm text-gray-900">{log.user?.email || '-'}</div>
                         </td>
                         <td className="px-6 py-4">
-                          <div className="text-sm text-gray-900 max-w-md truncate">
+                          <div className="text-sm text-gray-900 max-w-md white-space-pre-wrap break-words">
                             {log.details || '-'}
                           </div>
                         </td>

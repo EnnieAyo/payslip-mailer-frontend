@@ -99,3 +99,30 @@ export interface UserManagement extends User {
   isLocked: boolean;
   failedLoginAttempts?: number;
 }
+// Types for Employee Bulk Upload Feature
+
+export interface BulkEmployeeDto {
+  ippisNumber: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  department?: string;
+}
+
+export interface BulkUploadError {
+  row: number;
+  ippisNumber?: string;
+  // value: any;
+  errors: string[];
+}
+
+export interface BulkUploadResultDto {
+  totalRecords: number;
+  successCount: number;
+  failureCount: number;
+  errors: BulkUploadError[];
+  processingTime: string;
+}
+
+// Re-export batch types from payslip-batch.types
+export * from './payslip-batch.types';
