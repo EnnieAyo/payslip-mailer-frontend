@@ -130,7 +130,7 @@ export function Navigation() {
                 >
                   <div className="flex items-center space-x-3">
                     <UserCog className="w-5 h-5" />
-                    <span>Access Mgmt</span>
+                    <span>Access Manegement</span>
                   </div>
                   <ChevronDown className={`w-4 h-4 transition-transform ${isAccessMenuOpen ? 'rotate-180' : ''}`} />
                 </button>

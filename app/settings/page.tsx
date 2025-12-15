@@ -5,6 +5,7 @@ import { useSidebar } from '@/contexts/SidebarContext';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Navigation } from '@/components/Navigation';
+import { Footer } from '@/components/Footer';
 import { Button } from '@/components/Button';
 import { Input } from '@/components/Input';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
@@ -131,9 +132,9 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-dark-800">
+    <div className="min-h-screen bg-gray-50 dark:bg-dark-800 flex flex-col">
       <Navigation />
-      <main className={`transition-all duration-300 pt-16 md:pt-8 px-4 sm:px-6 lg:px-8 pb-8 ${
+      <main className={`flex-1 transition-all duration-300 pt-16 md:pt-8 px-4 sm:px-6 lg:px-8 pb-8 ${
         isCollapsed ? 'md:ml-20' : 'md:ml-64'
       }`}>
         <div className="max-w-5xl mx-auto">
@@ -293,6 +294,7 @@ export default function SettingsPage() {
         </div>
         </div>
       </main>
+      <Footer />
     </div>
   );
 }

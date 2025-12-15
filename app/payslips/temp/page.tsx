@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState, useCallback } from 'react';
 import { Navigation } from '@/components/Navigation';
 import { Button } from '@/components/Button';
+import { Footer } from '@/components/Footer';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '@/lib/api-client';
 import { Payslip } from '@/types';
@@ -135,9 +136,9 @@ export default function PayslipsPage() {
   const paginatedPayslips = filteredPayslips.slice((page - 1) * limit, page * limit);
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-dark-800">
+    <div className="min-h-screen bg-gray-50 dark:bg-dark-800 flex flex-col">
       <Navigation />
-      <main className={`transition-all duration-300 pt-16 md:pt-8 px-4 sm:px-6 lg:px-8 pb-8 ${
+      <main className={`flex-1 transition-all duration-300 pt-16 md:pt-8 px-4 sm:px-6 lg:px-8 pb-8 ${
         isCollapsed ? 'md:ml-20' : 'md:ml-64'
       }`}>
         <div className="mb-8">
@@ -369,6 +370,7 @@ export default function PayslipsPage() {
           )}
         </div>
       </main>
+      <Footer />
     </div>
   );
 }

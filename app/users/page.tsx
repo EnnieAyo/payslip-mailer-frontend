@@ -5,6 +5,7 @@ import { useSidebar } from '@/contexts/SidebarContext';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Navigation } from '@/components/Navigation';
+import { Footer } from '@/components/Footer';
 import { Button } from '@/components/Button';
 import { Modal } from '@/components/Modal';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -196,9 +197,10 @@ export default function UsersPage() {
   return (
     <>
       <Navigation />
-      <main className={`transition-all duration-300 pt-16 md:pt-8 px-4 sm:px-6 lg:px-8 pb-8 ${
-        isCollapsed ? 'md:ml-20' : 'md:ml-64'
-      }`}>
+      <div className="min-h-screen bg-gray-50 dark:bg-dark-800 flex flex-col">
+        <main className={`flex-1 transition-all duration-300 pt-16 md:pt-8 px-4 sm:px-6 lg:px-8 pb-8 ${
+          isCollapsed ? 'md:ml-20' : 'md:ml-64'
+        }`}>
         <div className="space-y-6">
           {/* Header */}
           <div className="flex justify-between items-center">
@@ -508,6 +510,8 @@ export default function UsersPage() {
           )}
         </div>
       </main>
+      <Footer />
+      </div>
     </>
   );
 }

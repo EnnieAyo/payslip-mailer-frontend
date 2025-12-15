@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { Button } from '@/components/Button';
@@ -8,7 +8,7 @@ import toast from 'react-hot-toast';
 import { CheckCircle, XCircle, Loader2, Mail } from 'lucide-react';
 import { apiClient } from '@/lib/api-client';
 
-export default function VerifyEmailPage() {
+function VerifyEmailContent() {
   const [verifying, setVerifying] = useState(true);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -129,5 +129,27 @@ export default function VerifyEmailPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function VerifyEmailPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gradient-to-br from-primary-50 to-white dark:from-dark-900 dark:to-dark-800 flex items-center justify-center px-4">
+        <div className="max-w-md w-full space-y-8">
+          <div className="text-center">
+            <div className="mx-auto w-16 h-16 bg-primary-100 dark:bg-primary-900 rounded-full flex items-center justify-center mb-4">
+              <Loader2 className="w-10 h-10 text-primary-600 dark:text-primary-400 animate-spin" />
+            </div>
+            <h1 className="text-3xl font-bold text-dark-900 dark:text-gray-100">Loading...</h1>
+            <p className="mt-2 text-gray-600 dark:text-gray-400">
+              Please wait...
+            </p>
+          </div>
+        </div>
+      </div>
+    }>
+      <VerifyEmailContent />
+    </Suspense>
   );
 }

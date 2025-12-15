@@ -7,6 +7,7 @@ import { Download, Upload, AlertCircle, CheckCircle, XCircle, ArrowLeft } from '
 import { toast } from 'react-hot-toast';
 import { Navigation } from '@/components/Navigation';
 import { Button } from '@/components/Button';
+import { Footer } from '@/components/Footer';
 import { apiClient } from '@/lib/api-client';
 import { BulkUploadResultDto } from '@/types';
 import { useSidebar } from '@/contexts/SidebarContext';
@@ -103,10 +104,10 @@ export default function EmployeeBulkUploadPage() {
   return (
     <>
       <Navigation />
-      <div className={`min-h-screen bg-gray-50 transition-all duration-300 pt-16 md:pt-8 pb-8 ${
+      <div className={`min-h-screen bg-gray-50 flex flex-col transition-all duration-300 pt-16 md:pt-8 pb-8 ${
         isCollapsed ? 'md:ml-20' : 'md:ml-64'
       }`}>
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex-1 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Header */}
           <div className="mb-8">
             <button
@@ -333,6 +334,7 @@ export default function EmployeeBulkUploadPage() {
           )}
         </div>
       </div>
+      <Footer />
     </>
   );
 }
