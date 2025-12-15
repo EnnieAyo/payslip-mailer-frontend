@@ -1,6 +1,7 @@
 'use client';
 
 import { useAuth } from '@/contexts/AuthContext';
+import { useSidebar } from '@/contexts/SidebarContext';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Navigation } from '@/components/Navigation';
@@ -31,6 +32,7 @@ const passwordSchema = Yup.object({
 
 export default function SettingsPage() {
   const { user, isLoading, updateUser } = useAuth();
+  const { isCollapsed } = useSidebar();
   const router = useRouter();
   const queryClient = useQueryClient();
 
@@ -131,13 +133,16 @@ export default function SettingsPage() {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-dark-800">
       <Navigation />
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-dark-900 dark:text-gray-100">Settings</h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-2">Manage your account settings and preferences</p>
-        </div>
+      <main className={`transition-all duration-300 pt-16 md:pt-8 px-4 sm:px-6 lg:px-8 pb-8 ${
+        isCollapsed ? 'md:ml-20' : 'md:ml-64'
+      }`}>
+        <div className="max-w-5xl mx-auto">
+          <div className="mb-8">
+            <h1 className="text-3xl font-bold text-dark-900 dark:text-gray-100">Settings</h1>
+            <p className="text-gray-600 dark:text-gray-400 mt-2">Manage your account settings and preferences</p>
+          </div>
 
-        <div className="space-y-6">
+          <div className="space-y-6">
           {/* Email Verification Status */}
           <div className="bg-white dark:bg-dark-700 rounded-lg border-2 border-primary-200 shadow p-6 hover:border-primary-400 transition-all duration-200">
             <div className="flex items-center space-x-3 mb-4">
@@ -285,6 +290,7 @@ export default function SettingsPage() {
               </div>
             </form>
           </div>
+        </div>
         </div>
       </main>
     </div>

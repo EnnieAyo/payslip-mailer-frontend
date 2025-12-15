@@ -4,6 +4,7 @@ import "./globals.css";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { QueryProvider } from "@/contexts/QueryProvider";
 import { ThemeProvider } from "@/contexts/ThemeContext";
+import { SidebarProvider } from "@/contexts/SidebarContext";
 import { Toaster } from "react-hot-toast";
 
 const geistSans = Geist({
@@ -32,13 +33,14 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-white dark:bg-dark-900 text-dark-900 dark:text-gray-100 transition-colors duration-200`}
       >
         <ThemeProvider>
-          <QueryProvider>
-            <AuthProvider>
-              {children}
-              <Toaster
-                position="top-right"
+          <SidebarProvider>
+            <QueryProvider>
+              <AuthProvider>
+                  {children}
+                <Toaster
+                  position="top-right"
                 toastOptions={{
-                  duration: 4000,
+                  duration: 5000,
                   style: {
                     background: '#000',
                     color: '#fff',
@@ -52,8 +54,9 @@ export default function RootLayout({
                   },
                 }}
               />
-            </AuthProvider>
-          </QueryProvider>
+              </AuthProvider>
+            </QueryProvider>
+          </SidebarProvider>
         </ThemeProvider>
       </body>
     </html>

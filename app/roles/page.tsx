@@ -1,6 +1,7 @@
 'use client';
 
 import { useAuth } from '@/contexts/AuthContext';
+import { useSidebar } from '@/contexts/SidebarContext';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Navigation } from '@/components/Navigation';
@@ -22,6 +23,7 @@ const roleSchema = Yup.object({
 
 export default function RolesPage() {
   const { user, isLoading } = useAuth();
+  const { isCollapsed } = useSidebar();
   const router = useRouter();
   const queryClient = useQueryClient();
 
@@ -160,7 +162,9 @@ export default function RolesPage() {
   return (
     <>
       <Navigation />
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className={`transition-all duration-300 pt-16 md:pt-8 px-4 sm:px-6 lg:px-8 pb-8 ${
+        isCollapsed ? 'md:ml-20' : 'md:ml-64'
+      }`}>
         <div className="space-y-6">
           {/* Header */}
           <div className="flex justify-between items-center">
