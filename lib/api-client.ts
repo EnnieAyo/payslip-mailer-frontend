@@ -92,6 +92,10 @@ class ApiClient {
     });
   }
 
+  async requestPasswordReset(email: string): Promise<ApiResponse<any>> {
+    return this.forgotPassword(email);
+  }
+
   async resetPassword(token: string, password: string): Promise<ApiResponse<any>> {
     return this.request('/auth/reset-password', {
       method: 'POST',
