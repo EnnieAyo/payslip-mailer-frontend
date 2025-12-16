@@ -19,12 +19,14 @@ export default function DashboardPage() {
     queryKey: ['employees', { page: 1, limit: 1 }],
     queryFn: () => apiClient.getEmployees(0, 1),
     enabled: !!user,
+    refetchOnMount: "always"
   });
 
-  const { data: unsentPayslipsData } = useQuery({
-    queryKey: ['payslips', 'unsent'],
-    queryFn: () => apiClient.getUnsentPayslips(),
+  const { data: payslipSummaryData } = useQuery({
+    queryKey: ['payslips', 'summary'],
+    queryFn: () => apiClient.getPayslipSummary(),
     enabled: !!user,
+    refetchOnMount: "always"
   });
   
   const { data: auditLogsData } = useQuery({
@@ -59,7 +61,7 @@ export default function DashboardPage() {
     },
     {
       title: 'Total Payslips',
-      value: (unsentPayslipsData?.data?.length || 0),
+      value: (payslipSummaryData?.data?.totalPayslips || 0),
       icon: FileText,
       color: 'text-dark-700',
       bgColor: 'bg-dark-100',
@@ -67,7 +69,7 @@ export default function DashboardPage() {
     },
     {
       title: 'Unsent Payslips',
-      value: unsentPayslipsData?.data?.filter((p: any) => !p.sentAt).length || 0,
+      value: payslipSummaryData?.data?.pendingPayslips || 0,
       icon: Clock,
       color: 'text-primary-700',
       bgColor: 'bg-primary-50',

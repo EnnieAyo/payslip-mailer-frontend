@@ -53,6 +53,12 @@ export interface Payslip {
   updatedAt: Date;
 }
 
+export interface PayslipSummary {
+  totalPayslips: number;
+  sentPayslips: number;
+  pendingPayslips: number;
+}
+
 export interface PaginationMeta {
   total: number;
   page: number;

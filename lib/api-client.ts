@@ -1,4 +1,4 @@
-import { AuthResponse, User, Employee, Payslip, AuditLog, PaginatedResponse, ApiResponse, UserManagement, Role, Permission, BulkUploadResultDto, PayslipBatch, BatchDetails, UploadResultDto, BatchSendResultDto, GetBatchesParams } from '@/types';
+import { AuthResponse, User, Employee, Payslip, AuditLog, PaginatedResponse, ApiResponse, UserManagement, Role, Permission, BulkUploadResultDto, PayslipBatch, BatchDetails, UploadResultDto, BatchSendResultDto, GetBatchesParams, PayslipSummary } from '@/types';
 import { getAuthToken } from './cookies';
 
 class ApiClient {
@@ -214,6 +214,10 @@ class ApiClient {
 
   async getUnsentPayslips(): Promise<ApiResponse<Payslip[]>> {
     return this.request('/payslips/unsent');
+  }
+
+  async getPayslipSummary(): Promise<ApiResponse<PayslipSummary>> {
+    return this.request('/payslips/summary');
   }
 
   async resendPayslip(id: number): Promise<ApiResponse<any>> {
