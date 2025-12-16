@@ -69,8 +69,9 @@ export function Navigation() {
       {/* Mobile Top Bar */}
       <div className="md:hidden fixed top-0 left-0 right-0 z-50 bg-dark-900 dark:bg-dark-950 border-b-2 border-primary-600">
         <div className="flex items-center justify-between h-16 px-4">
-          <Link href="/dashboard" className="text-xl font-bold text-primary-500">
-            Payslip Mailer
+          <Link href="/dashboard" className="flex items-center space-x-2">
+            <img src="/mailerlogo-removebg.png" alt="Payslip Mailer Logo" className="h-10 w-10" />
+            <span className="text-xl font-bold text-primary-500">Payslip Mailer</span>
           </Link>
           <div className="flex items-center space-x-2">
             <button
@@ -96,9 +97,14 @@ export function Navigation() {
       }`}>
         {/* Logo & Toggle */}
         <div className="h-16 flex items-center justify-between px-4 border-b-2 border-primary-600">
-          {!isSidebarCollapsed && (
-            <Link href="/dashboard" className="text-xl font-bold text-primary-500 hover:text-primary-400 transition-colors">
-              Payslip Mailer
+          {!isSidebarCollapsed ? (
+            <Link href="/dashboard" className="flex items-center space-x-2 hover:opacity-80 transition-opacity">
+              <img src="/mailerlogo-removebg.png" alt="Payslip Mailer Logo" className="h-10 w-10" />
+              <span className="text-xl font-bold text-primary-500">Payslip Mailer</span>
+            </Link>
+          ) : (
+            <Link href="/dashboard" className="flex items-center justify-center">
+              <img src="/mailerlogo-removebg.png" alt="Payslip Mailer Logo" className="h-3 w-3" />
             </Link>
           )}
           <button
