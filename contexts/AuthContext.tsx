@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { apiClient } from '@/lib/api-client';
 import { User, ApiResponse, AuthResponse } from '@/types';
 import { useIdleTimeout } from '@/hooks/useIdleTimeout';
+import { IdleTimeoutWarning } from '@/components/IdleTimeoutWarning';
 import toast from 'react-hot-toast';
 import {
   setAuthToken,
@@ -37,10 +38,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
 
-  // Idle timeout - 15 minutes
-  useIdleTimeout({
-    timeout: 15 * 60 * 1000,
-    onIdle: () => {
+  // Idle timeout - 15 minutes idle + 30 seconds warning
+  const { showWarning, countdown, reset } = useIdleTimeout({
+    idleTime: 15 * 60 * 1000, // 15 minutes
+    warningTime: 30 * 1000, // 30 seconds
+    onTimeout: () => {
       if (user) {
         toast.error('Session expired due to inactivity. Please login again.');
         logout();
@@ -48,6 +50,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     },
     enabled: !!user,
   });
+
+  const handleContinueSession = () => {
+    reset();
+  };
 
   useEffect(() => {
     // Check for stored auth on mount using cookies
@@ -128,6 +134,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }}
     >
       {children}
+      <IdleTimeoutWarning 
+        isOpen={showWarning}
+        countdown={countdown}
+        onContinue={handleContinueSession}
+      />
     </AuthContext.Provider>
   );
 }
