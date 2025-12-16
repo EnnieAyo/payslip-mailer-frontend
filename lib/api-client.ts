@@ -229,6 +229,10 @@ class ApiClient {
   async getAuditLogs(page: number, limit: number): Promise<ApiResponse<AuditLog[]>> {
     return this.request(`/audit/logs?page=${page}&limit=${limit}`);
   }
+  
+  async getUserAuditLogs(id: number, page: number, limit: number): Promise<ApiResponse<AuditLog[]>> {
+    return this.request(`/audit/trail/${id}?page=${page}&limit=${limit}`);
+  }
 
   // Profile & Settings endpoints
   async updateProfile(data: { firstName: string; lastName: string; email: string }): Promise<ApiResponse<User>> {

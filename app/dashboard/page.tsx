@@ -26,11 +26,12 @@ export default function DashboardPage() {
     queryFn: () => apiClient.getUnsentPayslips(),
     enabled: !!user,
   });
-
+  
   const { data: auditLogsData } = useQuery({
-    queryKey: ['audit-logs', { page: 1, limit: 10 }],
-    queryFn: () => apiClient.getAuditLogs(1, 10),
+    queryKey: ['audit-logs', { page: 1, limit: 10 },user?.id],
+    queryFn: () => apiClient.getUserAuditLogs(user?.id || 0, 1, 10),
     enabled: !!user,
+    refetchOnMount: "always"
   });
 
   useEffect(() => {

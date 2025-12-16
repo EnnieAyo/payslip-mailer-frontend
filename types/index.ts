@@ -76,6 +76,7 @@ export interface AuditLog {
   id: number;
   userId: number;
   user?: User;
+  status: string;
   action: string;
   details?: string;
   ipAddress?: string;

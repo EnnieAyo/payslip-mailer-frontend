@@ -48,7 +48,8 @@ export default function AuditLogsPage() {
         (log: AuditLog) =>
           log.action.toLowerCase().includes(search.toLowerCase()) ||
           log.user?.email.toLowerCase().includes(search.toLowerCase()) ||
-          log.details?.toLowerCase().includes(search.toLowerCase())
+          log.details?.toLowerCase().includes(search.toLowerCase())||
+          log.status.toLowerCase().includes(search.toLowerCase())
       )
     : auditLogs;
 
@@ -121,6 +122,9 @@ export default function AuditLogsPage() {
                         User
                       </th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        Status
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                         Details
                       </th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
@@ -140,9 +144,28 @@ export default function AuditLogsPage() {
                             {log.action}
                           </span>
                         </td>
+
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="text-sm text-gray-900 dark:text-gray-200">{log.user?.email || '-'}</div>
                         </td>
+
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <span
+                            className={`inline-flex px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                              log.status === 'success'
+                                ? 'bg-green-100 text-green-800'
+                                : log.status === 'failure'
+                                ? 'bg-red-100 text-red-800'
+                                : 'bg-gray-100 text-gray-800'
+                            }`}
+                          >
+                            {log.status.toUpperCase() || '-'}
+                          </span>
+                        </td>
+
+                        {/* <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm text-gray-900 dark:text-gray-200">{log.status || '-'}</div>
+                        </td> */}
                         <td className="px-6 py-4">
                           <div className="text-sm text-gray-900 dark:text-gray-200 max-w-md white-space-pre-wrap break-words">
                             {log.details || '-'}
