@@ -34,21 +34,35 @@ export function Navigation() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isAccessMenuOpen, setIsAccessMenuOpen] = useState(false);
 
+  // Function to check if user has required permission
+  const hasPermission = (permission: string) => {
+    return user?.permissions?.includes(permission) || false;
+  };
+
   const navItems = [
-    { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
-    { name: 'Employees', path: '/employees', icon: UsersRound },
-    { name: 'Payslips', path: '/payslips', icon: FileText },
-    { name: 'Reports', path: '/reports', icon: BarChart3 },
-    { name: 'Audit Logs', path: '/audit-logs', icon: ScrollText },
-    { name: 'Settings', path: '/settings', icon: Settings },
+    { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard, permission: null },
+    { name: 'Employees', path: '/employees', icon: UsersRound, permission: 'employees:read' },
+    { name: 'Payslips', path: '/payslips', icon: FileText, permission: 'payslips:read' },
+    { name: 'Reports', path: '/reports', icon: BarChart3, permission: 'reports:read' },
+    { name: 'Audit Logs', path: '/audit-logs', icon: ScrollText, permission: 'audit:read' },
+    { name: 'Settings', path: '/settings', icon: Settings, permission: null },
   ];
 
   const accessMenuItems = [
-    { name: 'Users', path: '/users', icon: Users },
-    { name: 'Roles', path: '/roles', icon: Shield },
+    { name: 'Users', path: '/users', icon: Users, permission: 'users:read' },
+    { name: 'Roles', path: '/roles', icon: Shield, permission: 'roles:read' },
   ];
 
-  const isAccessMenuActive = accessMenuItems.some(item => pathname === item.path);
+  // Filter navigation items based on permissions
+  const visibleNavItems = navItems.filter(item => 
+    item.permission === null || hasPermission(item.permission)
+  );
+
+  const visibleAccessMenuItems = accessMenuItems.filter(item => 
+    item.permission === null || hasPermission(item.permission)
+  );
+
+  const isAccessMenuActive = visibleAccessMenuItems.some(item => pathname === item.path);
 
   return (
     <>
@@ -98,7 +112,7 @@ export function Navigation() {
         {/* Navigation Links */}
         <nav className="flex-1 overflow-y-auto py-4 px-2">
           <div className="space-y-1">
-            {navItems.map((item) => {
+            {visibleNavItems.map((item) => {
               const Icon = item.icon;
               return (
                 <Link
@@ -118,32 +132,33 @@ export function Navigation() {
             })}
 
             {/* Access Management Section */}
-            <div className="pt-4 mt-4 border-t border-dark-700">
-              {!isSidebarCollapsed && (
-                <button
-                  onClick={() => setIsAccessMenuOpen(!isAccessMenuOpen)}
-                  className={`w-full flex items-center justify-between px-3 py-3 rounded-lg text-sm font-medium transition-all ${
-                    isAccessMenuActive
-                      ? 'bg-primary-500 text-dark-900'
-                      : 'text-gray-300 hover:bg-dark-800 hover:text-white'
-                  }`}
-                >
-                  <div className="flex items-center space-x-3">
-                    <UserCog className="w-5 h-5" />
-                    <span>Access Management</span>
-                  </div>
-                  <ChevronDown className={`w-4 h-4 transition-transform ${isAccessMenuOpen ? 'rotate-180' : ''}`} />
-                </button>
-              )}
+            {visibleAccessMenuItems.length > 0 && (
+              <div className="pt-4 mt-4 border-t border-dark-700">
+                {!isSidebarCollapsed && (
+                  <button
+                    onClick={() => setIsAccessMenuOpen(!isAccessMenuOpen)}
+                    className={`w-full flex items-center justify-between px-3 py-3 rounded-lg text-sm font-medium transition-all ${
+                      isAccessMenuActive
+                        ? 'bg-primary-500 text-dark-900'
+                        : 'text-gray-300 hover:bg-dark-800 hover:text-white'
+                    }`}
+                  >
+                    <div className="flex items-center space-x-3">
+                      <UserCog className="w-5 h-5" />
+                      <span>Access Management</span>
+                    </div>
+                    <ChevronDown className={`w-4 h-4 transition-transform ${isAccessMenuOpen ? 'rotate-180' : ''}`} />
+                  </button>
+                )}
 
-              {(!isSidebarCollapsed && isAccessMenuOpen) || isSidebarCollapsed ? (
-                <div className={isSidebarCollapsed ? 'space-y-1' : 'space-y-1 pl-4 mt-1'}>
-                  {accessMenuItems.map((item) => {
-                    const Icon = item.icon;
-                    return (
-                      <Link
-                        key={item.path}
-                        href={item.path}
+                {(!isSidebarCollapsed && isAccessMenuOpen) || isSidebarCollapsed ? (
+                  <div className={isSidebarCollapsed ? 'space-y-1' : 'space-y-1 pl-4 mt-1'}>
+                    {visibleAccessMenuItems.map((item) => {
+                      const Icon = item.icon;
+                      return (
+                        <Link
+                          key={item.path}
+                          href={item.path}
                         className={`flex items-center space-x-3 px-3 py-2 rounded-lg text-sm transition-all ${
                           pathname === item.path
                             ? 'bg-primary-500 text-dark-900'
@@ -158,7 +173,8 @@ export function Navigation() {
                   })}
                 </div>
               ) : null}
-            </div>
+              </div>
+            )}
           </div>
         </nav>
 
@@ -210,7 +226,7 @@ export function Navigation() {
             onClick={(e) => e.stopPropagation()}
           >
             <div className="px-4 pt-4 pb-3 space-y-1">
-              {navItems.map((item) => {
+              {visibleNavItems.map((item) => {
                 const Icon = item.icon;
                 return (
                   <Link
@@ -230,30 +246,32 @@ export function Navigation() {
               })}
 
               {/* Mobile Access Management Section */}
-              <div className="pt-4 mt-4 border-t border-dark-700">
-                <div className="px-3 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wider flex items-center space-x-2">
-                  <UserCog className="w-4 h-4" />
-                  <span>Access Management</span>
+              {visibleAccessMenuItems.length > 0 && (
+                <div className="pt-4 mt-4 border-t border-dark-700">
+                  <div className="px-3 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wider flex items-center space-x-2">
+                    <UserCog className="w-4 h-4" />
+                    <span>Access Management</span>
+                  </div>
+                  {visibleAccessMenuItems.map((item) => {
+                    const Icon = item.icon;
+                    return (
+                      <Link
+                        key={item.path}
+                        href={item.path}
+                        onClick={() => setIsMobileMenuOpen(false)}
+                        className={`flex items-center space-x-3 pl-6 pr-3 py-2 rounded-lg text-base font-medium transition-colors ${
+                          pathname === item.path
+                            ? 'bg-primary-500 text-dark-900'
+                            : 'text-gray-300 hover:bg-dark-800 hover:text-white'
+                        }`}
+                      >
+                        <Icon className="w-4 h-4" />
+                        <span>{item.name}</span>
+                      </Link>
+                    );
+                  })}
                 </div>
-                {accessMenuItems.map((item) => {
-                  const Icon = item.icon;
-                  return (
-                    <Link
-                      key={item.path}
-                      href={item.path}
-                      onClick={() => setIsMobileMenuOpen(false)}
-                      className={`flex items-center space-x-3 pl-6 pr-3 py-2 rounded-lg text-base font-medium transition-colors ${
-                        pathname === item.path
-                          ? 'bg-primary-500 text-dark-900'
-                          : 'text-gray-300 hover:bg-dark-800 hover:text-white'
-                      }`}
-                    >
-                      <Icon className="w-4 h-4" />
-                      <span>{item.name}</span>
-                    </Link>
-                  );
-                })}
-              </div>
+              )}
             </div>
 
             {/* Mobile User Section */}
