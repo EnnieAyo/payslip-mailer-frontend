@@ -11,6 +11,7 @@ class ApiClient {
   private getHeaders(): HeadersInit {
     const headers: HeadersInit = {
       'Content-Type': 'application/json',
+      'X-API-KEY': process.env.NEXT_PUBLIC_API_KEY || '',
     };
 
     // Get token from cookie instead of localStorage
@@ -144,7 +145,7 @@ class ApiClient {
     const response = await fetch(`${this.baseURL}/payslips/upload`, {
       method: 'POST',
       headers: {
-        ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+        ...(token ? { 'Authorization': `Bearer ${token}`, 'X-API-KEY': process.env.NEXT_PUBLIC_API_KEY || '' } : { 'X-API-KEY': process.env.NEXT_PUBLIC_API_KEY || '' }),
       },
       credentials: 'include',
       body: formData,
@@ -167,7 +168,7 @@ class ApiClient {
     const response = await fetch(`${this.baseURL}/payslips/upload`, {
       method: 'POST',
       headers: {
-        ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+        ...(token ? { 'Authorization': `Bearer ${token}`, 'X-API-KEY': process.env.NEXT_PUBLIC_API_KEY || '' } : { 'X-API-KEY': process.env.NEXT_PUBLIC_API_KEY || '' }),
       },
       credentials: 'include',
       body: formData,
@@ -350,6 +351,7 @@ class ApiClient {
     method: 'GET',
     headers: {
       'Authorization': `Bearer ${token}`,
+      'X-API-KEY': process.env.NEXT_PUBLIC_API_KEY || '',
     },
   });
 
@@ -369,7 +371,7 @@ class ApiClient {
     const response = await fetch(`${this.baseURL}/employees/bulk-upload`, {
       method: 'POST',
       headers: {
-        ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+        ...(token ? { 'Authorization': `Bearer ${token}`, 'X-API-KEY': process.env.NEXT_PUBLIC_API_KEY || '' } : { 'X-API-KEY': process.env.NEXT_PUBLIC_API_KEY || '' }),
       },
       credentials: 'include', // Important for cookies
       body: formData,
