@@ -74,10 +74,10 @@ export default function SettingsPage() {
   const toggle2FAMutation = useMutation({
     mutationFn: () => apiClient.toggle2FA(!twoFactorEnabled),
     onSuccess: (response) => {
-      setTwoFactorEnabled(response.data.enabled);
-      updateUser({ ...user!, twoFactorEnabled: response.data.enabled });
+      setTwoFactorEnabled(response.data.twoFactorEnabled);
+      updateUser({ ...user!, twoFactorEnabled: response.data.twoFactorEnabled });
       toast.success(
-        response.data.enabled ? '2FA enabled successfully' : '2FA disabled successfully'
+        response.data.twoFactorEnabled ? '2FA enabled successfully' : '2FA disabled successfully'
       );
     },
     onError: () => {

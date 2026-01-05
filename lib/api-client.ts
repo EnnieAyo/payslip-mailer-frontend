@@ -253,7 +253,7 @@ class ApiClient {
     });
   }
 
-  async toggle2FA(enabled: boolean): Promise<ApiResponse<{ enabled: boolean }>> {
+  async toggle2FA(enabled: boolean): Promise<ApiResponse<{ twoFactorEnabled: boolean }>> {
     return this.request('/auth/toggle-2fa', {
       method: 'POST',
       body: JSON.stringify({ enabled }),
