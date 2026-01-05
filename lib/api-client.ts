@@ -100,7 +100,7 @@ class ApiClient {
   async resetPasswordWithToken(token: string, password: string): Promise<ApiResponse<any>> {
     return this.request('/auth/reset-password-with-token', {
       method: 'POST',
-      body: JSON.stringify({ token, password }),
+      body: JSON.stringify({ token, newPassword: password }),
     });
   }
 
