@@ -49,7 +49,7 @@ function ResetPasswordForm() {
     setLoading(true);
 
     try {
-      await apiClient.resetPassword(token, password);
+      await apiClient.resetPasswordWithToken(token, password);
       setSuccess(true);
       toast.success('Password reset successful!');
     } catch (error: any) {

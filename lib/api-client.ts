@@ -97,8 +97,8 @@ class ApiClient {
     return this.forgotPassword(email);
   }
 
-  async resetPassword(token: string, password: string): Promise<ApiResponse<any>> {
-    return this.request('/auth/reset-password', {
+  async resetPasswordWithToken(token: string, password: string): Promise<ApiResponse<any>> {
+    return this.request('/auth/reset-password-with-token', {
       method: 'POST',
       body: JSON.stringify({ token, password }),
     });
