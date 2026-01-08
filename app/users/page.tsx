@@ -210,7 +210,7 @@ export default function UsersPage() {
                 variant="ghost"
                 onClick={() => queryClient.invalidateQueries({ queryKey: ['users'] })}
               >
-                <RefreshCw className="w-4 h-4" />
+                <RefreshCw className="w-4 h-4 dark:text-gray-500" />
               </Button>
               <Button onClick={() => setShowCreateModal(true)}>Create User</Button>
             </div>

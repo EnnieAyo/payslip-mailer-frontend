@@ -136,7 +136,7 @@ class ApiClient {
 
   // Payslip endpoints
   // Payslip Batch Management Endpoints
-  async uploadPayslipBatch(file: File, payMonth: string): Promise<ApiResponse<UploadResultDto>> {
+  async uploadPayslipBatch(file: File, payMonth: string): Promise<ApiResponse<{ message: string; jobId: string }>> {
     const formData = new FormData();
     formData.append('file', file);
     formData.append('payMonth', payMonth);
@@ -157,6 +157,28 @@ class ApiClient {
     }
 
     return response.json();
+  }
+
+  async getPayslipUploadJobStatus(jobId: string): Promise<ApiResponse<{
+    jobId: string;
+    state: 'queued' | 'processing' | 'completed' | 'failed';
+    progress: number;
+    result: UploadResultDto | null;
+    createdAt: number;
+    processedAt?: number;
+    finishedAt?: number;
+    failedReason?: string;
+  }>> {
+    return this.request<{
+      jobId: string;
+      state: 'queued' | 'processing' | 'completed' | 'failed';
+      progress: number;
+      result: UploadResultDto | null;
+      createdAt: number;
+      processedAt?: number;
+      finishedAt?: number;
+      failedReason?: string;
+    }>(`/payslips/upload/job/${jobId}`);
   }
 
   // Legacy single file upload method (for backward compatibility)
@@ -201,10 +223,14 @@ class ApiClient {
     return this.request(`/payslips/batches/${batchId}`);
   }
 
-  async sendBatch(batchId: string): Promise<ApiResponse<BatchSendResultDto>> {
+  async sendBatch(batchId: string): Promise<ApiResponse<{ message: string; jobId: string }>> {
     return this.request(`/payslips/batches/${batchId}/send`, {
       method: 'POST',
     });
+  }
+
+  async getSendBatchJobStatus(jobId: string): Promise<ApiResponse<any>> {
+    return this.request(`/payslips/batches/send/job/${jobId}`);
   }
 
   // Legacy/Individual Payslip Methods
@@ -371,7 +397,7 @@ class ApiClient {
   return response.blob();
   }
 
-  async bulkUploadEmployees(file: File): Promise<ApiResponse<BulkUploadResultDto>> {
+  async bulkUploadEmployees(file: File): Promise<ApiResponse<{ message: string; jobId: string }>> {
     const formData = new FormData();
     formData.append('file', file);
 
@@ -391,6 +417,28 @@ class ApiClient {
     }
 
     return response.json();
+  }
+
+  async getBulkUploadStatus(jobId: string): Promise<ApiResponse<{
+    jobId: string;
+    state: 'queued' | 'processing' | 'completed' | 'failed';
+    progress: number;
+    result: BulkUploadResultDto | null;
+    createdAt: number;
+    processedAt?: number;
+    finishedAt?: number;
+    failedReason?: string;
+  }>> {
+    return this.request<{
+      jobId: string;
+      state: 'queued' | 'processing' | 'completed' | 'failed';
+      progress: number;
+      result: BulkUploadResultDto | null;
+      createdAt: number;
+      processedAt?: number;
+      finishedAt?: number;
+      failedReason?: string;
+    }>(`/employees/bulk-upload/status/${jobId}`);
   }
 }
 

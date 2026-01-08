@@ -152,10 +152,10 @@ export default function EmployeesPage() {
               variant="ghost"
               onClick={() => queryClient.invalidateQueries({ queryKey: ['employees'] })}
             >
-              <RefreshCw className="w-4 h-4" />
+              <RefreshCw className="w-4 h-4 dark:text-gray-500" />
             </Button>
-            <Button variant="ghost" onClick={() => router.push('/employees/bulk-upload')}>
-              <Upload className="w-4 h-4 mr-2" />
+            <Button className="dark:text-gray-500" variant="ghost" onClick={() => router.push('/employees/bulk-upload')}>
+              <Upload className="w-4 h-4 mr-2 dark:text-gray-500" />
               Bulk Upload
             </Button>
             <Button onClick={() => setShowModal(true)}>

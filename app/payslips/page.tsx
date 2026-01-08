@@ -43,14 +43,6 @@ export default function PayslipBatchesPage() {
     enabled: !!user,
   });
 
-  const uploadMutation = useMutation({
-    mutationFn: ({ file, payMonth }: { file: File; payMonth: string }) =>
-      apiClient.uploadPayslipBatch(file, payMonth),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['payslip-batches'] });
-    },
-  });
-
   const batchDetailsMutation = useMutation({
     mutationFn: (batchId: string) => apiClient.getBatchDetails(batchId),
     onSuccess: (response) => {
@@ -139,7 +131,7 @@ export default function PayslipBatchesPage() {
               variant="ghost"
               onClick={() => queryClient.invalidateQueries({ queryKey: ['payslip-batches'] })}
             >
-              <RefreshCw className="w-4 h-4" />
+              <RefreshCw className="w-4 h-4 dark:text-gray-500" />
             </Button>
             <Button onClick={() => setUploadModalOpen(true)}>
               <Upload className="w-4 h-4 mr-2" />
@@ -317,7 +309,6 @@ export default function PayslipBatchesPage() {
         onSuccess={() => {
           queryClient.invalidateQueries({ queryKey: ['payslip-batches'] });
         }}
-        onUpload={(file, payMonth) => uploadMutation.mutateAsync({ file, payMonth })}
       />
 
       <BatchDetailsModal
@@ -325,6 +316,7 @@ export default function PayslipBatchesPage() {
         onClose={() => {
           setDetailsModalOpen(false);
           setSelectedBatch(null);
+          queryClient.invalidateQueries({ queryKey: ['payslip-batches'] });
         }}
         batch={selectedBatch}
         onSend={(batchId) => sendBatchMutation.mutateAsync(batchId)}

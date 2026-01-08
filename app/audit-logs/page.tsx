@@ -91,7 +91,7 @@ export default function AuditLogsPage() {
             variant="ghost"
             onClick={() => queryClient.invalidateQueries({ queryKey: ['audit-logs'] })}
           >
-            <RefreshCw className="w-4 h-4" />
+            <RefreshCw className="w-4 h-4 dark:text-gray-500" />
           </Button>
         </div>
 

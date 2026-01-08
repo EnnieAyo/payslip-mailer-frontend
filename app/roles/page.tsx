@@ -177,7 +177,7 @@ export default function RolesPage() {
                 variant="ghost"
                 onClick={() => queryClient.invalidateQueries({ queryKey: ['roles'] })}
               >
-                <RefreshCw className="w-4 h-4" />
+                <RefreshCw className="w-4 h-4 dark:text-gray-500" />
               </Button>
               <Button onClick={handleCreate}>Create Role</Button>
             </div>

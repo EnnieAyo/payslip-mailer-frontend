@@ -1,10 +1,11 @@
 'use client';
 
-import { useState } from 'react';
-import { X, Send, CheckCircle, XCircle, Clock, AlertCircle, Mail, User } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { X, Send, CheckCircle, XCircle, Clock, AlertCircle, Mail, User, Loader } from 'lucide-react';
 import { Button } from '@/components/Button';
 import { BatchDetails } from '@/types';
 import toast from 'react-hot-toast';
+import { apiClient } from '@/lib/api-client';
 
 interface BatchDetailsModalProps {
   isOpen: boolean;
@@ -16,21 +17,84 @@ interface BatchDetailsModalProps {
 
 export function BatchDetailsModal({ isOpen, onClose, batch, onSend, loading = false }: BatchDetailsModalProps) {
   const [sending, setSending] = useState(false);
-
-  if (!isOpen || !batch) return null;
+  const [jobId, setJobId] = useState<string | null>(null);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [processingStatus, setProcessingStatus] = useState<'waiting' | 'active' | 'completed' | 'failed'>('waiting');
+  const [progress, setProgress] = useState<number | { stage: string; processed: number; total: number; percentage: number } | null>(null);
+  const [failedReason, setFailedReason] = useState<string | null>(null);
 
   const handleSend = async () => {
     setSending(true);
     try {
-      await onSend(batch.uuid);
-      toast.success('Batch emails sent successfully!');
-      onClose();
+      const response = await onSend(batch?.uuid || '');
+      // Expecting { jobId: string } in response.data
+      if (response.data?.jobId) {
+        setJobId(response.data.jobId);
+        setIsProcessing(true);
+        setProcessingStatus('waiting');
+        toast.success('Email batch queued for sending');
+      }
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Failed to send batch');
+      toast.error(error instanceof Error ? error.message : 'Failed to queue batch');
+      setIsProcessing(false);
     } finally {
       setSending(false);
     }
   };
+
+  // Poll job status
+  useEffect(() => {
+    if (!jobId || !isProcessing) return;
+
+    const pollInterval = setInterval(async () => {
+      try {
+        const response = await apiClient.getSendBatchJobStatus(jobId);
+        const jobStatus = response.data;
+
+        if (jobStatus) {
+          setProcessingStatus(jobStatus.state);
+          setProgress(jobStatus.progress);
+
+          // Handle completed state
+          if (jobStatus.state === 'completed') {
+            setIsProcessing(false);
+            toast.success('All emails sent successfully!');
+
+            // Close modal after short delay
+            setTimeout(() => {
+              handleReset();
+              onClose();
+            }, 5000);
+          }
+
+          // Handle failed state
+          if (jobStatus.state === 'failed') {
+            setIsProcessing(false);
+            setFailedReason(jobStatus.failedReason || 'Unknown error occurred');
+            toast.error(jobStatus.failedReason || 'Email sending failed');
+          }
+        }
+      } catch (error: any) {
+        console.error('Error polling job status:', error);
+        setIsProcessing(false);
+        setProcessingStatus('failed');
+        setFailedReason(error.message || 'Failed to check send status');
+        toast.error('Failed to check send status.');
+      }
+    }, 3000); // Poll every 3 seconds
+
+    return () => clearInterval(pollInterval);
+  }, [jobId, isProcessing, onClose]);
+
+  const handleReset = () => {
+    setJobId(null);
+    setIsProcessing(false);
+    setProcessingStatus('waiting');
+    setProgress(null);
+    setFailedReason(null);
+  };
+
+  if (!isOpen || !batch) return null;
 
   const getStatusBadge = (status: string) => {
     const statusConfig = {
@@ -219,6 +283,82 @@ export function BatchDetailsModal({ isOpen, onClose, batch, onSend, loading = fa
               </div>
             </div>
           </div>
+
+          {/* Processing Status */}
+          {isProcessing && (
+            <div className="bg-white dark:bg-dark-700 rounded-lg border border-gray-200 dark:border-dark-600 p-4">
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">Sending Emails</h3>
+                <div className={`flex items-center text-sm ${
+                  processingStatus === 'failed' ? 'text-red-600 dark:text-red-400' :
+                  processingStatus === 'completed' ? 'text-green-600 dark:text-green-400' :
+                  'text-blue-600 dark:text-blue-400'
+                }`}>
+                  {processingStatus === 'failed' ? (
+                    <XCircle className="w-4 h-4 mr-2" />
+                  ) : processingStatus === 'completed' ? (
+                    <CheckCircle className="w-4 h-4 mr-2" />
+                  ) : (
+                    <Loader className="w-4 h-4 mr-2 animate-spin" />
+                  )}
+                  <span className="font-medium capitalize">{processingStatus}</span>
+                </div>
+              </div>
+
+              <div className={`rounded-lg p-3 ${
+                processingStatus === 'failed'
+                  ? 'bg-red-50 dark:bg-red-900/20'
+                  : processingStatus === 'completed'
+                  ? 'bg-green-50 dark:bg-green-900/20'
+                  : 'bg-blue-50 dark:bg-blue-900/20'
+              }`}>
+                <div className="flex items-start">
+                  {processingStatus === 'failed' ? (
+                    <AlertCircle className="w-4 h-4 text-red-600 dark:text-red-400 mr-2 mt-0.5 flex-shrink-0" />
+                  ) : processingStatus === 'completed' ? (
+                    <CheckCircle className="w-4 h-4 text-green-600 dark:text-green-400 mr-2 mt-0.5 flex-shrink-0" />
+                  ) : (
+                    <Clock className="w-4 h-4 text-blue-600 dark:text-blue-400 mr-2 mt-0.5 flex-shrink-0" />
+                  )}
+                  <div className="flex-1">
+                    <p className={`text-xs mb-1 ${
+                      processingStatus === 'failed'
+                        ? 'text-red-700 dark:text-red-300'
+                        : processingStatus === 'completed'
+                        ? 'text-green-700 dark:text-green-300'
+                        : 'text-blue-700 dark:text-blue-300'
+                    }`}>
+                      Job ID: <span className="font-mono font-semibold">{jobId}</span>
+                    </p>
+                    {failedReason && processingStatus === 'failed' && (
+                      <p className="text-xs text-red-600 dark:text-red-400 mt-1">{failedReason}</p>
+                    )}
+                    {typeof progress === 'object' && progress && (
+                      <p className="text-xs text-blue-600 dark:text-blue-400 mt-1">
+                        Sent {progress.processed} of {progress.total} emails
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Progress bar */}
+              {processingStatus !== 'failed' && processingStatus !== 'completed' && (
+                <div className="mt-3">
+                  <div className="flex justify-between text-xs text-gray-600 dark:text-gray-400 mb-1">
+                    <span>Progress</span>
+                    <span>{typeof progress === 'object' && progress ? progress.percentage : (progress ?? 0)}%</span>
+                  </div>
+                  <div className="w-full bg-gray-200 dark:bg-dark-600 rounded-full h-1.5">
+                    <div
+                      className="bg-blue-600 dark:bg-blue-500 h-1.5 rounded-full transition-all duration-500"
+                      style={{ width: `${typeof progress === 'object' && progress ? progress.percentage : (progress ?? 0)}%` }}
+                    ></div>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Footer */}
@@ -240,15 +380,15 @@ export function BatchDetailsModal({ isOpen, onClose, batch, onSend, loading = fa
             <Button
               variant="secondary"
               onClick={onClose}
-              disabled={sending}
+              disabled={sending || isProcessing}
             >
-              Close
+              {isProcessing ? 'Processing...' : 'Close'}
             </Button>
-            {canSend && (
+            {canSend && !isProcessing && (
               <Button
                 onClick={handleSend}
                 loading={sending}
-                disabled={sending || loading}
+                disabled={sending || loading || isProcessing}
               >
                 <Send className="w-4 h-4 mr-2" />
                 Send Emails
