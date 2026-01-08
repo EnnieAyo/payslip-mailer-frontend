@@ -15,7 +15,7 @@ import { Role, Permission } from '@/types';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import toast from 'react-hot-toast';
-import { MoreVertical, Pencil, Trash2, Shield, CheckCircle } from 'lucide-react';
+import { MoreVertical, Pencil, Trash2, Shield, CheckCircle, RefreshCw } from 'lucide-react';
 
 const roleSchema = Yup.object({
   name: Yup.string().required('Role name is required'),
@@ -172,7 +172,15 @@ export default function RolesPage() {
           {/* Header */}
           <div className="flex justify-between items-center">
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Role Management</h1>
-            <Button onClick={handleCreate}>Create Role</Button>
+            <div className="flex gap-2">
+              <Button
+                variant="ghost"
+                onClick={() => queryClient.invalidateQueries({ queryKey: ['roles'] })}
+              >
+                <RefreshCw className="w-4 h-4" />
+              </Button>
+              <Button onClick={handleCreate}>Create Role</Button>
+            </div>
           </div>
 
           {/* Roles Table */}

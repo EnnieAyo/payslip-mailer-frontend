@@ -10,7 +10,7 @@ import { Button } from '@/components/Button';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '@/lib/api-client';
 import { PayslipBatch, BatchDetails } from '@/types/payslip-batch.types';
-import { Upload, Search, ChevronLeft, ChevronRight, Eye, Send, CheckCircle, Clock, AlertCircle } from 'lucide-react';
+import { Upload, Search, ChevronLeft, ChevronRight, Eye, Send, CheckCircle, Clock, AlertCircle, RefreshCw } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { PayslipUploadModal } from '@/components/payslips/PayslipUploadModal';
 import { BatchDetailsModal } from '@/components/payslips/BatchDetailsModal';
@@ -134,10 +134,18 @@ export default function PayslipBatchesPage() {
               Upload, review, and send payslip batches
             </p>
           </div>
-          <Button onClick={() => setUploadModalOpen(true)}>
-            <Upload className="w-4 h-4 mr-2" />
-            Upload Batch
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              variant="ghost"
+              onClick={() => queryClient.invalidateQueries({ queryKey: ['payslip-batches'] })}
+            >
+              <RefreshCw className="w-4 h-4" />
+            </Button>
+            <Button onClick={() => setUploadModalOpen(true)}>
+              <Upload className="w-4 h-4 mr-2" />
+              Upload Batch
+            </Button>
+          </div>
         </div>
 
         <div className="bg-white dark:bg-dark-700 rounded-lg shadow mb-6">

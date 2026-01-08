@@ -1,9 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
-import { Download, Upload, AlertCircle, CheckCircle, XCircle, ArrowLeft } from 'lucide-react';
+import { Download, Upload, AlertCircle, CheckCircle, XCircle, ArrowLeft, RefreshCw } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { Navigation } from '@/components/Navigation';
 import { Button } from '@/components/Button';
@@ -16,6 +16,7 @@ import { useSidebar } from '@/contexts/SidebarContext';
 export default function EmployeeBulkUploadPage() {
   const router = useRouter();
   const { isCollapsed } = useSidebar();
+  const queryClient = useQueryClient();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [uploadResult, setUploadResult] = useState<BulkUploadResultDto | null>(null);
   const [isDownloading, setIsDownloading] = useState(false);
@@ -109,18 +110,29 @@ export default function EmployeeBulkUploadPage() {
       }`}>
         <div className="flex-1 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Header */}
-          <div className="mb-8">
-            <button
-              onClick={() => router.push('/employees')}
-              className="flex items-center text-gray-600 hover:text-gray-900 mb-4"
+          <div className="mb-8 flex items-start justify-between">
+            <div>
+              <button
+                onClick={() => router.push('/employees')}
+                className="flex items-center text-gray-600 hover:text-gray-900 mb-4"
+              >
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back to Employees
+              </button>
+              <h1 className="text-3xl font-bold text-gray-900">Bulk Employee Upload</h1>
+              <p className="mt-2 text-gray-600">
+                Upload an Excel file to create multiple employees at once
+              </p>
+            </div>
+            <Button
+              variant="ghost"
+              onClick={() => {
+                setUploadResult(null);
+                setSelectedFile(null);
+              }}
             >
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Employees
-            </button>
-            <h1 className="text-3xl font-bold text-gray-900">Bulk Employee Upload</h1>
-            <p className="mt-2 text-gray-600">
-              Upload an Excel file to create multiple employees at once
-            </p>
+              <RefreshCw className="w-4 h-4" />
+            </Button>
           </div>
 
           {/* Instructions Card */}

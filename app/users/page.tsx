@@ -14,7 +14,7 @@ import { UserManagement, Role } from '@/types';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import toast from 'react-hot-toast';
-import { MoreVertical, Lock, Unlock, Shield, Trash2 } from 'lucide-react';
+import { MoreVertical, Lock, Unlock, Shield, Trash2, RefreshCw } from 'lucide-react';
 
 const userSchema = Yup.object({
   email: Yup.string().email('Invalid email').required('Email is required'),
@@ -205,7 +205,15 @@ export default function UsersPage() {
           {/* Header */}
           <div className="flex justify-between items-center">
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white">User Management</h1>
-            <Button onClick={() => setShowCreateModal(true)}>Create User</Button>
+            <div className="flex gap-2">
+              <Button
+                variant="ghost"
+                onClick={() => queryClient.invalidateQueries({ queryKey: ['users'] })}
+              >
+                <RefreshCw className="w-4 h-4" />
+              </Button>
+              <Button onClick={() => setShowCreateModal(true)}>Create User</Button>
+            </div>
           </div>
 
           {/* Search */}

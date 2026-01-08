@@ -12,7 +12,7 @@ import { Modal } from '@/components/Modal';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '@/lib/api-client';
 import { Employee } from '@/types';
-import { Search, Plus, Pencil, Trash2, ChevronLeft, ChevronRight, Upload } from 'lucide-react';
+import { Search, Plus, Pencil, Trash2, ChevronLeft, ChevronRight, Upload, RefreshCw } from 'lucide-react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import toast from 'react-hot-toast';
@@ -142,30 +142,25 @@ export default function EmployeesPage() {
       <main className={`flex-1 transition-all duration-300 pt-16 md:pt-8 px-4 sm:px-6 lg:px-8 pb-8 ${
         isCollapsed ? 'md:ml-20' : 'md:ml-64'
       }`}>
-        <div className="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between">
+        <div className="mb-8 flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold text-dark-900 dark:text-gray-100">Employees</h1>
             <p className="text-gray-600 dark:text-gray-400 mt-2">Manage employee records</p>
           </div>
-            <div className="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between">
-              <Button
-                onClick={() => {
-                  setEditingEmployee(null);
-                  formik.resetForm();
-                  setShowModal(true);
-                }}
-                className="mt-4 mr-2 sm:mt-0"
-              >
-                <Plus className="w-4 h-4 mr-2" />
-                Add Employee
-              </Button>
-              <Button
-              variant='secondary'
-              onClick={() => router.push('/employees/bulk-upload')}
-              className="mt-4 mr-2 sm:mt-0"
+          <div className="flex gap-2">
+            <Button
+              variant="ghost"
+              onClick={() => queryClient.invalidateQueries({ queryKey: ['employees'] })}
             >
+              <RefreshCw className="w-4 h-4" />
+            </Button>
+            <Button variant="ghost" onClick={() => router.push('/employees/bulk-upload')}>
               <Upload className="w-4 h-4 mr-2" />
-              Mass Upload
+              Bulk Upload
+            </Button>
+            <Button onClick={() => setShowModal(true)}>
+              <Plus className="w-4 h-4 mr-2" />
+              Add Employee
             </Button>
           </div>
         </div>

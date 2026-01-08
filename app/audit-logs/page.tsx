@@ -7,15 +7,16 @@ import { useEffect, useState } from 'react';
 import { Navigation } from '@/components/Navigation';
 import { Footer } from '@/components/Footer';
 import { Button } from '@/components/Button';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '@/lib/api-client';
 import { AuditLog } from '@/types';
-import { Search, ChevronLeft, ChevronRight, Activity } from 'lucide-react';
+import { Search, ChevronLeft, ChevronRight, Activity, RefreshCw } from 'lucide-react';
 
 export default function AuditLogsPage() {
   const { user, isLoading } = useAuth();
   const { isCollapsed } = useSidebar();
   const router = useRouter();
+  const queryClient = useQueryClient();
 
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
@@ -81,9 +82,17 @@ export default function AuditLogsPage() {
       <main className={`flex-1 transition-all duration-300 pt-16 md:pt-8 px-4 sm:px-6 lg:px-8 pb-8 ${
         isCollapsed ? 'md:ml-20' : 'md:ml-64'
       }`}>
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-dark-900 dark:text-gray-100">Audit Logs</h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-2">View system activity and user actions</p>
+        <div className="mb-8 flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-dark-900 dark:text-gray-100">Audit Logs</h1>
+            <p className="text-gray-600 dark:text-gray-400 mt-2">View system activity and user actions</p>
+          </div>
+          <Button
+            variant="ghost"
+            onClick={() => queryClient.invalidateQueries({ queryKey: ['audit-logs'] })}
+          >
+            <RefreshCw className="w-4 h-4" />
+          </Button>
         </div>
 
         <div className="bg-white dark:bg-dark-700 rounded-lg shadow mb-6">

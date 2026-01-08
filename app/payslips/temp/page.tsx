@@ -141,9 +141,17 @@ export default function PayslipsPage() {
       <main className={`flex-1 transition-all duration-300 pt-16 md:pt-8 px-4 sm:px-6 lg:px-8 pb-8 ${
         isCollapsed ? 'md:ml-20' : 'md:ml-64'
       }`}>
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-dark-900 dark:text-gray-100">Payslips</h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-2">Upload and manage employee payslips</p>
+        <div className="mb-8 flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-dark-900 dark:text-gray-100">Payslips</h1>
+            <p className="text-gray-600 dark:text-gray-400 mt-2">Upload and manage employee payslips</p>
+          </div>
+          <Button
+            variant="ghost"
+            onClick={() => queryClient.invalidateQueries({ queryKey: ['payslips'] })}
+          >
+            <RefreshCw className="w-4 h-4" />
+          </Button>
         </div>
 
         <div
