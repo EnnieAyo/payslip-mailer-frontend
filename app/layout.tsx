@@ -6,6 +6,7 @@ import { QueryProvider } from "@/contexts/QueryProvider";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { SidebarProvider } from "@/contexts/SidebarContext";
 import { Toaster } from "react-hot-toast";
+import { generateOrganizationSchema } from "@/lib/seo";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -18,8 +19,37 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: process.env.NEXT_PUBLIC_APP_NAME || "Payslip Mailer",
-  description: "Employee payslip management system",
+  title: {
+    default: process.env.NEXT_PUBLIC_APP_NAME || "Payslip Mailer",
+    template: `%s | ${process.env.NEXT_PUBLIC_APP_NAME || "Payslip Mailer"}`,
+  },
+  description: "Secure and efficient employee payslip management system. Upload, manage, and distribute payslips to employees via email with automated batch processing.",
+  keywords: ["payslip management", "employee management", "payroll system", "payslip distribution", "HR management", "employee payslips"],
+  authors: [{ name: process.env.NEXT_PUBLIC_APP_NAME || "Payslip Mailer" }],
+  creator: process.env.NEXT_PUBLIC_APP_NAME || "Payslip Mailer",
+  publisher: process.env.NEXT_PUBLIC_APP_NAME || "Payslip Mailer",
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'),
+  robots: {
+    index: false,
+    follow: false,
+    googleBot: {
+      index: false,
+      follow: false,
+    },
+  },
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
+    title: process.env.NEXT_PUBLIC_APP_NAME || "Payslip Mailer",
+    description: "Secure and efficient employee payslip management system",
+    siteName: process.env.NEXT_PUBLIC_APP_NAME || "Payslip Mailer",
+  },
+  twitter: {
+    card: "summary",
+    title: process.env.NEXT_PUBLIC_APP_NAME || "Payslip Mailer",
+    description: "Secure and efficient employee payslip management system",
+  },
 };
 
 export default function RootLayout({
@@ -27,8 +57,18 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const organizationSchema = generateOrganizationSchema();
+
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(organizationSchema),
+          }}
+        />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-white dark:bg-dark-900 text-dark-900 dark:text-gray-100 transition-colors duration-200`}
       >
