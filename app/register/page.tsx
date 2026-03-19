@@ -1,12 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import Link from 'next/link';
 import { Button } from '@/components/Button';
 import { Input } from '@/components/Input';
 import toast from 'react-hot-toast';
 import { CheckCircle } from 'lucide-react';
+import { useRouter } from 'next/dist/client/components/navigation';
 
 export default function RegisterPage() {
   const [formData, setFormData] = useState({
@@ -19,6 +20,12 @@ export default function RegisterPage() {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const { register } = useAuth();
+  const router = useRouter();
+
+  // deactivite registration by redirecting to login page
+  useEffect(() => {
+    router.push('/login');
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });

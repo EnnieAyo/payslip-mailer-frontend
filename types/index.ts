@@ -1,3 +1,9 @@
+export interface Organization {
+  id: number;
+  name: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
 export interface User {
   id: number;
   email: string;
@@ -11,7 +17,20 @@ export interface User {
   lastLoginAt?: Date;
   createdAt: Date;
   updatedAt: Date;
+  isSuperUser?: boolean;
+  organizationId?: string;
+  organization?: Organization;
 }
+
+export interface  jobProgress {
+            stage: string,
+            processed: number,
+            total: number,
+            percentage: number,
+            successCount?: number,
+            failureCount?: number,
+            skippedCount?: number
+          };
 
 
 export interface AuthResponse {
@@ -39,6 +58,7 @@ export interface Employee {
   position?: string;
   createdAt: Date;
   updatedAt: Date;
+  organization?: Organization;
 }
 
 export interface Payslip {
@@ -51,6 +71,7 @@ export interface Payslip {
   sentAt?: Date;
   createdAt: Date;
   updatedAt: Date;
+  organization?: Organization;
 }
 
 export interface PayslipSummary {
@@ -88,6 +109,7 @@ export interface AuditLog {
   ipAddress?: string;
   userAgent?: string;
   createdAt: Date;
+  organization?: Organization;
 }
 
 export interface Role {
@@ -114,6 +136,7 @@ export interface BulkEmployeeDto {
   lastName: string;
   email: string;
   department?: string;
+  organizationId?: string;
 }
 
 export interface BulkUploadError {

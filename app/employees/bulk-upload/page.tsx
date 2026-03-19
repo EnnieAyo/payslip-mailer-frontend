@@ -8,7 +8,7 @@ import { toast } from 'react-hot-toast';
 import { Navigation } from '@/components/Navigation';
 import { Button } from '@/components/Button';
 import { Footer } from '@/components/Footer';
-import { apiClient } from '@/lib/api-client';
+import { apiClient, jobProgress } from '@/lib/api-client';
 import { BulkUploadResultDto } from '@/types';
 import { useSidebar } from '@/contexts/SidebarContext';
 // import { BulkUploadResultDto, BulkUploadError } from '@/types/bulk-upload.types';
@@ -22,8 +22,8 @@ export default function EmployeeBulkUploadPage() {
   const [isDownloading, setIsDownloading] = useState(false);
   const [jobId, setJobId] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [processingStatus, setProcessingStatus] = useState<'queued' | 'processing' | 'completed' | 'failed' | 'parsing' >('queued');
-  const [progress, setProgress] = useState(0);
+  const [processingStatus, setProcessingStatus] = useState<'queued' | 'processing' | 'completed' | 'failed' | 'parsing' | 'active' >('queued');
+  const [progress, setProgress] = useState<jobProgress>({ stage: 'queued', processed: 0, total: 0, percentage: 0 });
   const [failedReason, setFailedReason] = useState<string | null>(null);
 
   // Download template mutation
@@ -154,7 +154,7 @@ export default function EmployeeBulkUploadPage() {
     setJobId(null);
     setIsProcessing(false);
     // setProcessingStatus('queued');
-    setProgress(0);
+    setProgress({ stage: 'queued', processed: 0, total: 0, percentage: 0 });
     setFailedReason(null);
   };
 
@@ -189,7 +189,7 @@ export default function EmployeeBulkUploadPage() {
                 setJobId(null);
                 setIsProcessing(false);
                 // setProcessingStatus('queued');
-                setProgress(0);
+                setProgress({ stage: 'queued', processed: 0, total: 0, percentage: 0 });
                 setFailedReason(null);
               }}
             >
@@ -369,12 +369,12 @@ export default function EmployeeBulkUploadPage() {
                 <div className="mt-4">
                   <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400 mb-2">
                     <span>Progress</span>
-                    <span>{progress}%</span>
+                    <span>{progress.percentage}%</span>
                   </div>
                   <div className="w-full bg-gray-200 dark:bg-dark-600 rounded-full h-2">
-                    <div 
+                    <div
                       className="bg-blue-600 dark:bg-blue-500 h-2 rounded-full transition-all duration-500" 
-                      style={{ width: `${progress}%` }}
+                      style={{ width: `${progress.percentage}%` }}
                     ></div>
                   </div>
                 </div>

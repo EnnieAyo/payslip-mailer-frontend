@@ -1,4 +1,5 @@
-import { AuthResponse, User, Employee, Payslip, AuditLog, PaginatedResponse, ApiResponse, UserManagement, Role, Permission, BulkUploadResultDto, PayslipBatch, BatchDetails, UploadResultDto, BatchSendResultDto, GetBatchesParams, PayslipSummary } from '@/types';
+
+import { AuthResponse, User, Employee, Payslip, AuditLog, PaginatedResponse, ApiResponse, UserManagement, Role, Permission, BulkUploadResultDto, PayslipBatch, BatchDetails, UploadResultDto, BatchSendResultDto, GetBatchesParams, PayslipSummary, jobProgress } from '@/types';
 import { getAuthToken } from './cookies';
 
 class ApiClient {
@@ -162,7 +163,7 @@ class ApiClient {
   async getPayslipUploadJobStatus(jobId: string): Promise<ApiResponse<{
     jobId: string;
     state: 'queued' | 'processing' | 'completed' | 'failed';
-    progress: number;
+    progress: jobProgress;
     result: UploadResultDto | null;
     createdAt: number;
     processedAt?: number;
@@ -172,7 +173,7 @@ class ApiClient {
     return this.request<{
       jobId: string;
       state: 'queued' | 'processing' | 'completed' | 'failed';
-      progress: number;
+      progress: jobProgress;
       result: UploadResultDto | null;
       createdAt: number;
       processedAt?: number;
@@ -421,8 +422,8 @@ class ApiClient {
 
   async getBulkUploadStatus(jobId: string): Promise<ApiResponse<{
     jobId: string;
-    state: 'queued' | 'processing' | 'completed' | 'failed';
-    progress: number;
+    state: 'queued' | 'processing' | 'completed' | 'failed' | 'active';
+    progress: jobProgress;
     result: BulkUploadResultDto | null;
     createdAt: number;
     processedAt?: number;
@@ -431,14 +432,40 @@ class ApiClient {
   }>> {
     return this.request<{
       jobId: string;
-      state: 'queued' | 'processing' | 'completed' | 'failed';
-      progress: number;
+      state: 'queued' | 'processing' | 'completed' | 'failed' | 'active';
+      progress: jobProgress;
       result: BulkUploadResultDto | null;
       createdAt: number;
       processedAt?: number;
       finishedAt?: number;
       failedReason?: string;
     }>(`/employees/bulk-upload/status/${jobId}`);
+  }
+
+  // Organization endpoints
+  async updateOrganization(id: number, data: { name: string }): Promise<ApiResponse<any>> {
+    return this.request(`/organizations/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async deleteOrganization(id: number): Promise<ApiResponse<any>> {
+    return this.request(`/organizations/${id}`, {
+      method: 'DELETE',
+    });
+  }
+
+  // Organization endpoints
+  async createOrganization(data: { name: string }): Promise<ApiResponse<any>> {
+    return this.request('/organizations', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async getOrganizations(): Promise<ApiResponse<any>> {
+    return this.request('/organizations');
   }
 }
 
