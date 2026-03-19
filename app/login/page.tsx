@@ -129,7 +129,7 @@ export default function LoginPage() {
 
       <Modal
         isOpen={show2FA}
-        onClose={() => setShow2FA(false)}
+        onClose={() => {setShow2FA(false); setTwoFactorCode('');}}
         title="Two-Factor Authentication"
       >
         <form onSubmit={handleVerify2FA} className="space-y-4">
@@ -152,7 +152,7 @@ export default function LoginPage() {
               type="button"
               variant="secondary"
               fullWidth
-              onClick={() => setShow2FA(false)}
+              onClick={() => {setShow2FA(false); setTwoFactorCode('');}}
             >
               Cancel
             </Button>
