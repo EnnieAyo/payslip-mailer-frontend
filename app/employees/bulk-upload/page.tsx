@@ -8,8 +8,8 @@ import { toast } from 'react-hot-toast';
 import { Navigation } from '@/components/Navigation';
 import { Button } from '@/components/Button';
 import { Footer } from '@/components/Footer';
-import { apiClient, jobProgress } from '@/lib/api-client';
-import { BulkUploadResultDto } from '@/types';
+import { apiClient } from '@/lib/api-client';
+import { BulkUploadResultDto, jobProgress } from '@/types';
 import { useSidebar } from '@/contexts/SidebarContext';
 // import { BulkUploadResultDto, BulkUploadError } from '@/types/bulk-upload.types';
 
